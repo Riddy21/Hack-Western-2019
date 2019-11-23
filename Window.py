@@ -18,6 +18,7 @@ class Window():
         self.groupsFrame = tk.Frame(self.window)
         self.membersFrame = tk.Frame(self.window)
         self.profileFrame = tk.Frame(self.window)
+        self.friendsFrame = tk.Frame(self.window)
         self.holdFrame = tk.Frame(self.window) # holder frame
 
         self.window.title("Test")
@@ -25,6 +26,7 @@ class Window():
         self.window.resizable(1, 1)
 
         self.populateMain()
+        self.populateFriends()
         self.populateGroups()
         self.populateMembers()
         self.populateProfile()
@@ -44,13 +46,9 @@ class Window():
 
         profiles = tk.LabelFrame(self.mainFrame, text = "Profiles and Groups",pady = 5, padx = 5 )
 
-        tk.Button(profiles, text="Your\nProfile").pack(side="left")
-
-        #Replace with for loop adding names of all group names in self.Groups
-        tk.Button(profiles, text = "Group\n1").pack(side = "left")
-        tk.Button(profiles, text="Group\n2").pack(side="left")
-        tk.Button(profiles, text="Group\n3").pack(side="left")
-        tk.Button(profiles, text="Group\n4").pack(side="left")
+        tk.Button(profiles, text="Your\nProfile",command = lambda: self.switchFrame(self.profileFrame,self.mainFrame)).pack(side="left")
+        tk.Button(profiles, text = "Friends\n#",command = lambda: self.switchFrame(self.friendsFrame,self.mainFrame)).pack(side = "left")
+        tk.Button(profiles, text="Groups\n#",command = lambda: self.switchFrame(self.groupsFrame,self.mainFrame)).pack(side="left")
 
         profiles.pack()
 
@@ -84,6 +82,23 @@ class Window():
         transactionViewWin.resizable(0, 0)
 
         (transactionViewWin).mainloop()
+    def addNewFriendWin(self):
+        addfriendWin = tk.Tk()
+        addfriendWin.title("Add Friend")
+        addfriendWin.geometry("300x200")
+        addfriendWin.resizable(0,0)
+
+        addfriendWin.mainloop()
+
+    def addNewGroupWin(self):
+        addGroupWin = tk.Tk()
+        addGroupWin.title("Add Friend")
+        addGroupWin.geometry("300x200")
+        addGroupWin.resizable(0, 0)
+
+        addGroupWin.mainloop()
+    def populateFriends(self):
+        tk.Label(self.friendsFrame, text="empty").pack()
 
     def populateGroups(self):
         tk.Label(self.groupsFrame, text="empty").pack()
