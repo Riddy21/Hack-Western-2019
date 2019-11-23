@@ -1,0 +1,9 @@
+Objects needed to be passed in
+
+username and password authentication
+
+Group Linked list
+	getters: Group name, 
+
+Recent Transactions linked list
+	getters: Name, date, amount

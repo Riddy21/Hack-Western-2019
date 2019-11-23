@@ -8,12 +8,13 @@ class Window():
 
         self.monthlyBudget = tk.StringVar()
 
-        #Groups
+        #Create list of Groups
+
+        #Create list of recent transactions
 
 
         #Frames
         self.mainFrame = tk.Frame(self.window)
-        self.transactionFrame = tk.Frame(self.window)
         self.groupsFrame = tk.Frame(self.window)
         self.membersFrame = tk.Frame(self.window)
         self.profileFrame = tk.Frame(self.window)
@@ -24,7 +25,6 @@ class Window():
         self.window.resizable(1, 1)
 
         self.populateMain()
-        self.populateTransaction()
         self.populateGroups()
         self.populateMembers()
         self.populateProfile()
@@ -40,11 +40,13 @@ class Window():
         self.monthlyBudget.set("500")
         tk.Label(self.mainFrame, text = "Your Monthly Budget is:").pack()
         tk.Label(self.mainFrame, text = self.monthlyBudget.get()).pack()
-        tk.Button(self.mainFrame,text = "Add a Transaction",command = lambda: self.switchFrame(self.transactionFrame,self.mainFrame)).pack()
+        tk.Button(self.mainFrame,text = "Add a Transaction",command = self.openTransactionWin).pack()
 
         profiles = tk.LabelFrame(self.mainFrame, text = "Profiles and Groups",pady = 5, padx = 5 )
 
         tk.Button(profiles, text="Your\nProfile").pack(side="left")
+
+        #Replace with for loop adding names of all group names in self.Groups
         tk.Button(profiles, text = "Group\n1").pack(side = "left")
         tk.Button(profiles, text="Group\n2").pack(side="left")
         tk.Button(profiles, text="Group\n3").pack(side="left")
@@ -58,18 +60,30 @@ class Window():
         tk.Label(recentTrans, text="Date",pady = 10).grid(sticky = "W",row=0, column=1)
         tk.Label(recentTrans, text="Amount",pady = 10).grid(sticky = "W",row=0, column=2)
 
+        #replace i with list of recent transactinos
         for i in range(10):
             tk.Label(recentTrans, text="Amazon").grid(sticky = "W",row = i+1, column = 0)
             tk.Label(recentTrans, text="11/12/2019").grid(sticky = "W",row = i+1, column = 1)
             tk.Label(recentTrans, text="$50").grid(sticky = "W",row = i+1, column = 2)
-            tk.Button(recentTrans, text = "View").grid(sticky = "W",row = i+1, column = 3)
+            tk.Button(recentTrans, text = "View", command = lambda: self.openViewTransactionWin(i)).grid(sticky = "W",row = i+1, column = 3) # change i into list of transactions
 
         recentTrans.pack()
 
 
-    def populateTransaction(self):
-        tk.Label(self.transactionFrame,text = "2").pack()
-        tk.Button(self.transactionFrame,text = "bop",command = lambda: self.switchFrame(self.mainFrame,self.transactionFrame)).pack()
+    def openTransactionWin(self):
+        transactionWin = tk.Tk()
+        transactionWin.title("Add Transaction")
+        transactionWin.geometry("300x200")
+        transactionWin.resizable(0, 0)
+
+        (transactionWin).mainloop()
+    def openViewTransactionWin(self,transaction):
+        transactionViewWin = tk.Tk()
+        transactionViewWin.title("View Transaction")
+        transactionViewWin.geometry("300x200")
+        transactionViewWin.resizable(0, 0)
+
+        (transactionViewWin).mainloop()
 
     def populateGroups(self):
         tk.Label(self.groupsFrame, text="empty").pack()
