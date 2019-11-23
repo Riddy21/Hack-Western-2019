@@ -20,7 +20,7 @@ class Window():
         self.holdFrame = tk.Frame(self.window) # holder frame
 
         self.window.title("Test")
-        self.window.geometry("500x800")
+        self.window.geometry("500x500")
         self.window.resizable(1, 1)
 
         self.populateMain()
@@ -54,11 +54,17 @@ class Window():
 
         recentTrans = tk.LabelFrame(self.mainFrame, text = "Recent Transactions",pady = 5, padx = 5 )
 
-        tk.Label(recentTrans, text = "")
+        tk.Label(recentTrans, text="Name",pady = 10).grid(sticky = "W", row = 0, column = 0)
+        tk.Label(recentTrans, text="Date",pady = 10).grid(sticky = "W",row=0, column=1)
+        tk.Label(recentTrans, text="Amount",pady = 10).grid(sticky = "W",row=0, column=2)
 
-        tk.LabelFrame(self.mainFrame,text = "Recent Transactions").pack()
+        for i in range(10):
+            tk.Label(recentTrans, text="Amazon").grid(sticky = "W",row = i+1, column = 0)
+            tk.Label(recentTrans, text="11/12/2019").grid(sticky = "W",row = i+1, column = 1)
+            tk.Label(recentTrans, text="$50").grid(sticky = "W",row = i+1, column = 2)
+            tk.Button(recentTrans, text = "View").grid(sticky = "W",row = i+1, column = 3)
 
-
+        recentTrans.pack()
 
 
     def populateTransaction(self):
