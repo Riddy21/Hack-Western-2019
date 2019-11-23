@@ -41,10 +41,23 @@ class Window():
         tk.Label(self.mainFrame, text = "Your Monthly Budget is:").pack()
         tk.Label(self.mainFrame, text = self.monthlyBudget.get()).pack()
         tk.Button(self.mainFrame,text = "Add a Transaction",command = lambda: self.switchFrame(self.transactionFrame,self.mainFrame)).pack()
-        profiles = tk.Frame(self.mainFrame).pack()
 
-        tk.Button(profiles, text = "Your\nProfile").pack(side = "left")
-        tk.Button(profiles, text = "Group").pack(side = "left")
+        profiles = tk.LabelFrame(self.mainFrame, text = "Profiles and Groups",pady = 5, padx = 5 )
+
+        tk.Button(profiles, text="Your\nProfile").pack(side="left")
+        tk.Button(profiles, text = "Group\n1").pack(side = "left")
+        tk.Button(profiles, text="Group\n2").pack(side="left")
+        tk.Button(profiles, text="Group\n3").pack(side="left")
+        tk.Button(profiles, text="Group\n4").pack(side="left")
+
+        profiles.pack()
+
+        recentTrans = tk.LabelFrame(self.mainFrame, text = "Recent Transactions",pady = 5, padx = 5 )
+
+        tk.Label(recentTrans, text = "")
+
+        tk.LabelFrame(self.mainFrame,text = "Recent Transactions").pack()
+
 
 
 
