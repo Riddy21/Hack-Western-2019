@@ -12,9 +12,7 @@ class Window():
         self.window.geometry("500x800")
         self.window.resizable(1, 1)
 
-
-        self.populate()
+        self.populateMain()
         (self.window).mainloop()
     def populateMain(self):
         self.mainFrame.pack()
-    def
