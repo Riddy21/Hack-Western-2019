@@ -38,11 +38,15 @@ class Window():
 
     def populateMain(self):
         self.monthlyBudget.set("500")
-        tk.Label(self.mainFrame, text = "Your Monthly Budget is:").grid(row = 0, columnspan = 2)
-        tk.Label(self.mainFrame, text = self.monthlyBudget.get()).grid(row = 1,columnspan = 2)
-        tk.Button(self.mainFrame,text = "Add a Transaction",command = lambda: self.switchFrame(self.transactionFrame,self.mainFrame)).grid(row = 2, columnspan = 2)
-        tk.Button(self.mainFrame, text = "Your\nProfile").grid(row = 3,column = 0)
-        tk.Button(self.mainFrame, text = "Group 1").grid(row = 3,column = 1) # Groups are linked list of group objects
+        tk.Label(self.mainFrame, text = "Your Monthly Budget is:").pack()
+        tk.Label(self.mainFrame, text = self.monthlyBudget.get()).pack()
+        tk.Button(self.mainFrame,text = "Add a Transaction",command = lambda: self.switchFrame(self.transactionFrame,self.mainFrame)).pack()
+        profiles = tk.Frame(self.mainFrame).pack()
+
+        tk.Button(profiles, text = "Your\nProfile").pack(side = "left")
+        tk.Button(profiles, text = "Group").pack(side = "left")
+
+
 
     def populateTransaction(self):
         tk.Label(self.transactionFrame,text = "2").pack()
