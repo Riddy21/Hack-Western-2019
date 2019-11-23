@@ -29,3 +29,4 @@ class Window():
     def populateTransaction(self):
         self.destroyFrame(self.mainFrame)
         self.transactionFrame.pack()
+        #fsfg
