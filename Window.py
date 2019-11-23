@@ -16,3 +16,4 @@ class Window():
         (self.window).mainloop()
     def populateMain(self):
         self.mainFrame.pack()
+        print(1)
