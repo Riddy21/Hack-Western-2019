@@ -49,8 +49,14 @@ class Window():
 
 
     def populateTransaction(self):
+        expenseName = ""
+        amount = 0
         tk.Label(self.transactionFrame,text = "Expense Name: ").pack()
+        tk.Entry(self.transactionFrame,textvariable = expenseName).pack()
         tk.Label(self.transactionFrame,text = "Amount: ").pack()
+        tk.Entry(self.transactionFrame,textvariable = amount).pack()
+        tk.Radiobutton(self.transactionFrame, text = "Personal")
+        tk.Radiobutton(self.transactionFrame, text = "Group")
 
         tk.Button(self.transactionFrame,text = "Add",command = lambda: self.switchFrame(self.mainFrame,self.transactionFrame)).pack()
         tk.Button(self.transactionFrame,text = "Cancel",command = lambda: self.switchFrame(self.mainFrame,self.transactionFrame)).pack()
