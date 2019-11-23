@@ -49,8 +49,11 @@ class Window():
 
 
     def populateTransaction(self):
-        tk.Label(self.transactionFrame,text = "2").pack()
-        tk.Button(self.transactionFrame,text = "bop",command = lambda: self.switchFrame(self.mainFrame,self.transactionFrame)).pack()
+        tk.Label(self.transactionFrame,text = "Expense Name: ").pack()
+        tk.Label(self.transactionFrame,text = "Amount: ").pack()
+
+        tk.Button(self.transactionFrame,text = "Add",command = lambda: self.switchFrame(self.mainFrame,self.transactionFrame)).pack()
+        tk.Button(self.transactionFrame,text = "Cancel",command = lambda: self.switchFrame(self.mainFrame,self.transactionFrame)).pack()
 
     def populateGroups(self):
         tk.Label(self.groupsFrame, text="empty").pack()
