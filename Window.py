@@ -390,9 +390,46 @@ class Window():
     def addNewGroupWin(self):
         addGroupWin = tk.Tk()
         addGroupWin.title("Add Group")
-        addGroupWin.geometry("300x200")
+        addGroupWin.geometry("300x400")
         addGroupWin.resizable(0, 0)
 
+        groupName= tk.StringVar(addGroupWin)
+
+        NewGroup = tk.Frame(addGroupWin)
+        NewGroup.pack()
+
+        tk.Label(NewGroup, text="Group Name: ").grid(row=0, column=0)
+        tk.Entry(NewGroup, textvariable = groupName).grid(row=0, column=1)
+
+        friendsListGroup = dict()
+        
+
+        # replace i with list of friends
+        allFriends = tk.LabelFrame(NewGroup,padx=5 ,pady=10)
+        allFriends.grid(row=2, column=1)
+
+        length = 3 # length of the entries of friends
+        checkValArr = []
+
+        for i in range(0,length):
+            friendName = "Just in Bieber " + str(i) #always change this to next friend
+            checkValArr.append(tk.IntVar(addGroupWin,0))
+            Friend = tk.LabelFrame(allFriends,padx=5 ,pady=10)
+            Friend.grid( row=i, column=0)
+            tk.Label(Friend, text=friendName, pady=10).grid(sticky="W", row=0, column=0) 
+            tk.Checkbutton(Friend,variable = checkValArr[i], onvalue = i, offvalue = -1,command = lambda:changeFriendToGroup(friendsListGroup,friendName,i,checkValArr) ).grid(sticky="W", row=0, column=1)
+
+        def changeFriendToGroup(arr,friendName,idx,valArr):
+            if valArr[idx].get() != -1: 
+                arr[friendName] = True
+            else:
+                if friendName in arr: 
+                    del(arr[friendName])
+            print(arr)
+            print(valArr)
+            print(idx)
+            print(valArr[idx].get())
+        
         addGroupWin.mainloop()
 
     def populateFriends(self):
@@ -429,9 +466,9 @@ class Window():
             
             tk.Label(GroupFr, text="Group Name: " + str(i), pady=10).grid(sticky="W", row=i + 1, column=0) # change i to $ and actual groups
             Group = tk.LabelFrame(GroupFr,padx=5)
-            tk.Label(Group, text="$ " + str(i), pady=10).grid(sticky="W", row=i + 1, column=0)
+            tk.Label(Group, text="$ " + str(i) ,pady=10).grid(sticky="W", row=i + 1, column=0,padx =(0,20))
             for j in range(3):
-                tk.Label(Group, text="M " + str(j), pady=10).grid(sticky="W", row=0, column=j+1)
+                tk.Label(Group, text="M" + str(j), pady=10).grid(sticky="W", row=i + 1, column=j+1)
             Group.grid(sticky="W", row=i + 2, column=0)
             GroupFr.pack()
         allGroups.pack()
