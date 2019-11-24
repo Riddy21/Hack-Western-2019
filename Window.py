@@ -140,9 +140,6 @@ class Window():
             tk.Button(groupF, text="Add").grid(row=4, column=0) #add function creates expense in database, updates recent expenses and closes window
             tk.Button(groupF, text="Cancel", command = transactionWin.destroy).grid(row=4, column=1)
 
-            if sum != float(amount.get()):
-                tk.Label(groupF,text = )
-
         def personal(frame, window):
             frame.destroy()
 
@@ -171,27 +168,89 @@ class Window():
 
         (transactionViewWin).mainloop()
 
-    def addNewFriendWin(self):
+    def addNewFriendWin(self,frame):
         addfriendWin = tk.Tk()
         addfriendWin.title("Add Friend")
         addfriendWin.geometry("300x200")
         addfriendWin.resizable(0, 0)
 
+        friendName= tk.StringVar(addfriendWin)
+
+        NewFriend = tk.Frame(addfriendWin)
+        NewFriend.pack()
+        tk.Label(NewFriend, text="Name: ").grid(row=0, column=0)
+        tk.Entry(NewFriend, textvariable = friendName).grid(row=0, column=1)
+        buttonFriend = tk.Button(NewFriend, text="Add Friend",command = lambda: add(addfriendWin, friendName),state = "disabled")
+        buttonFriend.grid(row=4, column=0)
+        tk.Button(NewFriend, text="Cancel",command = lambda: cancel(addfriendWin)).grid(row=4, column=2)
+        tk.Button(NewFriend, text="Search Friend", command = lambda: searchFriend(NewFriend,buttonFriend,friendName)).grid(row=1, column=1)
+        
+        def cancel(window):
+            window.destroy()
+
+        def add(window,friendName):
+            window.destroy()
+            Friend = tk.LabelFrame(frame,padx=5 ,pady=10)
+            tk.Label(Friend, text=friendName.get(), pady=10).grid(sticky="W", row=1, column=0) # change i to $ and actual friends
+            tk.Label(Friend, text="$ " + str(100), pady=10).grid(sticky="W", row=1, column=1)
+            Friend.pack()
+
+        def searchFriend(frame, button,name):
+            #if not name: return
+            tk.Label(frame, text="Friend Found!").grid(row=2, column=1)
+            button.config(state="normal")
+
         addfriendWin.mainloop()
+        
 
     def addNewGroupWin(self):
         addGroupWin = tk.Tk()
-        addGroupWin.title("Add Friend")
+        addGroupWin.title("Add Group")
         addGroupWin.geometry("300x200")
         addGroupWin.resizable(0, 0)
 
         addGroupWin.mainloop()
 
     def populateFriends(self):
-        tk.Label(self.friendsFrame, text="empty").pack()
+        NavBar = tk.LabelFrame(self.friendsFrame, pady=5, padx=5)
+        tk.Button(NavBar, text="Friends",relief = "sunken",state = "disabled").pack(side = "left")
+        tk.Button(NavBar, text="Groups",state = "normal",command=lambda: self.switchFrame(self.groupsFrame,self.friendsFrame)).pack(side = "left")
+        NavBar.pack()
+
+        allFriends = tk.LabelFrame(self.friendsFrame, pady=5, padx=5)
+
+        tk.Button(self.friendsFrame, text="+",state = "normal",command=lambda: self.addNewFriendWin(allFriends)).pack()
+
+        
+        # replace i with list of recent transactinos
+        for i in range(3):
+            Friend = tk.LabelFrame(allFriends,padx=5 ,pady=10)
+            tk.Label(Friend, text="Friend Name " + str(i), pady=10).grid(sticky="W", row=i + 1, column=0) # change i to $ and actual friends
+            tk.Label(Friend, text="$ " + str(i), pady=10).grid(sticky="W", row=i + 1, column=1)
+            Friend.pack()
+        allFriends.pack()
 
     def populateGroups(self):
-        tk.Label(self.groupsFrame, text="empty").pack()
+        NavBar = tk.LabelFrame(self.groupsFrame, pady=5, padx=5)
+        tk.Button(NavBar, text="Friends",state = "normal",command=lambda: self.switchFrame(self.friendsFrame,self.groupsFrame)).pack(side = "left")
+        tk.Button(NavBar, text="Groups",relief = "sunken",state = "disabled").pack(side = "left")
+        NavBar.pack()
+
+        tk.Button(self.groupsFrame, text="+",state = "normal",command=lambda: self.addNewGroupWin()).pack()
+
+        allGroups = tk.LabelFrame(self.groupsFrame, pady=5, padx=5)
+        # replace i with list of recent transactinos
+        for i in range(3):
+            GroupFr = tk.LabelFrame(allGroups,padx=5)
+            
+            tk.Label(GroupFr, text="Group Name: " + str(i), pady=10).grid(sticky="W", row=i + 1, column=0) # change i to $ and actual groups
+            Group = tk.LabelFrame(GroupFr,padx=5)
+            tk.Label(Group, text="$ " + str(i), pady=10).grid(sticky="W", row=i + 1, column=0)
+            for j in range(3):
+                tk.Label(Group, text="M " + str(j), pady=10).grid(sticky="W", row=0, column=j+1)
+            Group.grid(sticky="W", row=i + 2, column=0)
+            GroupFr.pack()
+        allGroups.pack()
 
     def populateMembers(self):
         tk.Label(self.membersFrame, text="empty").pack()
