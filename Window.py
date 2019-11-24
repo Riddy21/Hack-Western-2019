@@ -134,7 +134,7 @@ class Window():
 
             groupMembers.grid(row = 3, columnspan = 2)
 
-            addBut = tk.Button(groupF, text="Add", state = "normal", command =lambda: addExpense(groupF, amount,memberAmount)).grid(row=4, column=0) #add function creates expense in database, updates recent expenses and closes window
+            tk.Button(groupF, text="Add", state = "normal", command =lambda: addExpense(groupF, amount,memberAmount)).grid(row=4, column=0) #add function creates expense in database, updates recent expenses and closes window
             tk.Button(groupF, text="Cancel", command = transactionWin.destroy).grid(row=4, column=1)
 
             def addExpense(groupF, amount, memberAmount):
@@ -150,7 +150,10 @@ class Window():
 
 
                 else:
-                    #save amount for ea
+                    #save amount for each person
+                    print(amount.get())
+                    transactionWin.destroy()
+
 
         def personal(frame, window):
             frame.destroy()
