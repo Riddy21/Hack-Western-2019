@@ -2,7 +2,7 @@ import tkinter as tk
 import time
 from datetime import date
 import DataBase as mdb
-
+import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
 # Implement the default Matplotlib key bindings.
@@ -432,43 +432,34 @@ class Window():
         addGroupWin.geometry("300x400")
         addGroupWin.resizable(0, 0)
 
-        groupName = tk.StringVar(addGroupWin)
-
         NewGroup = tk.Frame(addGroupWin)
         NewGroup.pack()
+
+        OPTIONS = self.dbInterface.getFriendsList(self.userName)  # change to list of friends and groups
+        OPTIONS.insert(0, self.userName)
+        groupName = tk.StringVar(NewGroup)
+        groupFriend = tk.StringVar(NewGroup, value = OPTIONS[0])
+        groupMembers = []
 
         tk.Label(NewGroup, text="Group Name: ").grid(row=0, column=0)
         tk.Entry(NewGroup, textvariable=groupName).grid(row=0, column=1)
 
-        friendsListGroup = dict()
+        w = tk.OptionMenu(NewGroup, groupFriend, *OPTIONS)
+        w.grid(row=1, column=0)
+        tk.Button(NewGroup, text="Add Friend", command=lambda: addFriendtoList()).grid(row=1, column=1)
 
-        # replace i with list of friends
-        allFriends = tk.LabelFrame(NewGroup, padx=5, pady=10)
-        allFriends.grid(row=2, column=1)
+        def addFriendtoList():
+            if (groupFriend.get() in groupMembers) == False:
+                groupMembers.append(groupFriend.get())
+                for i in range(len(groupMembers)):  # according to Group getMembers
+                    allFriends = tk.LabelFrame(NewGroup, padx=5, pady=10)
+                    tk.Label(allFriends, text=groupMembers[i], padx = 10).pack()
+                    allFriends.grid(row=3+i, columnspan = 3)
+        tk.Button(NewGroup, text="Create Group", command = lambda: createGroup()).grid(row=2, columnspan = 2)
 
-        length = 3  # length of the entries of friends
-        checkValArr = []
+        def createGroup():
+            #TODO: create a group using specified parameters and pass in nessesary variables
 
-        for i in range(0, length):
-            friendName = "Just in Bieber " + str(i)  # always change this to next friend
-            checkValArr.append(tk.IntVar(addGroupWin, 0))
-            Friend = tk.LabelFrame(allFriends, padx=5, pady=10)
-            Friend.grid(row=i, column=0)
-            tk.Label(Friend, text=friendName, pady=10).grid(sticky="W", row=0, column=0)
-            tk.Checkbutton(Friend, variable=checkValArr[i], onvalue=i, offvalue=-1,
-                           command=lambda: changeFriendToGroup(friendsListGroup, friendName, i, checkValArr)).grid(
-                sticky="W", row=0, column=1)
-
-        def changeFriendToGroup(arr, friendName, idx, valArr):
-            if valArr[idx].get() != -1:
-                arr[friendName] = True
-            else:
-                if friendName in arr:
-                    del (arr[friendName])
-            print(arr)
-            print(valArr)
-            print(idx)
-            print(valArr[idx].get())
 
         addGroupWin.mainloop()
 
@@ -524,4 +515,10 @@ class Window():
         tk.Label(self.membersFrame, text="empty").pack()
 
     def populateProfile(self):
-        tk.Label(self.profileFrame, text="empty").pack()
+        labels = 'Frogs', 'Hogs', 'Dogs', 'Logs'
+        fracs = [15, 30, 45, 10]
+        fig, axs = plt.subplots(2, 2)
+
+        # A standard pie plot
+        axs[0, 0].pie(fracs, labels=labels, autopct='%1.1f%%', shadow=True)
+        tk.Button(self.profileFrame, text="Back", command = lambda: self.switchFrame(self.mainFrame,self.profileFrame)).pack()
