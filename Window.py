@@ -74,27 +74,81 @@ class Window():
     def openTransactionWin(self):
         transactionWin = tk.Tk()
         transactionWin.title("Add Transaction")
-        transactionWin.geometry("300x200")
+        transactionWin.geometry("300x600")
         transactionWin.resizable(0, 0)
 
         transType = tk.Frame(transactionWin)
         transType.pack()
 
         tk.Label(transType, text="What kind of transaction?").pack()
+        tk.Button(transType, text="Personal", command=lambda: personal(transType, transactionWin)).pack(side="left")
         tk.Button(transType, text="Group", command=lambda: group(transType, transactionWin)).pack(side="left")
-        tk.Button(transType, text="Personal", command=lambda: personal(transType, transactionWin)).pack(side="right")
+        tk.Button(transType, text="Friends", command=lambda: group(transType, transactionWin)).pack(side="left")
 
         def group(frame, window):
             frame.destroy()
+
             groupF = tk.Frame(window)
+            expName = tk.StringVar()
+            amount = tk.StringVar()
+            memberAmount = []
+
+
             groupF.pack()
-            tk.Label(groupF, text="Hello").pack()
+
+            tk.Label(groupF, text="Expense Name").grid(row=0, column=0)
+            tk.Label(groupF, text="Amount").grid(row=1, column=0)
+            unEntry = tk.Entry(groupF, textvariable=expName)
+            unEntry.grid(row=0, column=1)
+            pwEntry = tk.Entry(groupF, textvariable=amount)
+            pwEntry.grid(row=1, column=1)
+
+            OPTIONS = [
+                "Group 1",
+                "Group 2",
+                "Group 3",
+                "Group 4"
+            ]  # change to list of friends and groups
+
+            default = tk.StringVar(groupF)
+            default.set(OPTIONS[0])  # default value
+
+            w = tk.OptionMenu(groupF, default, *OPTIONS)
+            w.grid(row=2, columnspan = 2)
+
+            groupMembers = tk.LabelFrame(groupF)
+
+            for i in range(10):  # according to Group getMembers
+                memberName = tk.StringVar() #change to group Member get name
+                memberName.set("bob")
+                memberAmount.append(tk.StringVar())
+                memberAmount[i].set(str(float(int(amount.get()))/10))
+                tk.Label(groupMembers, text = memberName.get()).grid(row=i, column=0)
+                unEntry = tk.Entry(groupMembers, textvariable=memberAmount)
+                unEntry.grid(row=i, column=1)
+
+            groupMembers.grid(row = 3, columnspan = 2)
+
+            tk.Button(groupF, text="Add").grid(row=4, column=0) #add function creates expense in database, updates recent expenses and closes window
+            tk.Button(groupF, text="Cancel", command = transactionWin.destroy).grid(row=4, column=1)
 
         def personal(frame, window):
             frame.destroy()
+
             personalF = tk.Frame(window)
+            expName = tk.StringVar()
+            amount = tk.StringVar()
+
             personalF.pack()
-            tk.Label(personalF, text="Hello").pack()
+
+            tk.Label(personalF, text="Expense Name").grid(row=0, column=0)
+            tk.Label(personalF, text="Amount").grid(row=1, column=0)
+            unEntry = tk.Entry(personalF, textvariable=expName)
+            unEntry.grid(row=0, column=1)
+            pwEntry = tk.Entry(personalF, textvariable=amount)
+            pwEntry.grid(row=1, column=1)
+            tk.Button(personalF, text="Add").grid(row=2,column=0)  # add function creates expense in database, updates recent expenses and closes window
+            tk.Button(personalF, text="Cancel", command=transactionWin.destroy).grid(row=2, column=1)
 
         transactionWin.mainloop()
 
