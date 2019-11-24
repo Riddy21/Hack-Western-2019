@@ -90,16 +90,32 @@ class Window():
         tk.Label(recentTrans, text="Name", pady=10).grid(sticky="W", row=0, column=0)
         tk.Label(recentTrans, text="Date", pady=10).grid(sticky="W", row=0, column=1)
         tk.Label(recentTrans, text="Amount", pady=10).grid(sticky="W", row=0, column=2)
+        tk.Label(recentTrans, text="Category", pady=10).grid(sticky="W", row=0, column=3)
 
         #TODO
         # replace i with list of recent transactinos
-        for i in range(10):
-            tk.Label(recentTrans, text="Amazon").grid(sticky="W", row=i + 1, column=0)
-            tk.Label(recentTrans, text="11/12/2019").grid(sticky="W", row=i + 1, column=1)
-            tk.Label(recentTrans, text="$50").grid(sticky="W", row=i + 1, column=2)
-            tk.Button(recentTrans, text="View", command=lambda: self.openViewTransactionWin(i)).grid(sticky="W",
+        recentTransList = list(self.dbInterface.get_recentTransactions())
+        print(recentTransList)
+        if len(recentTransList)<10:
+            for i in range(len(recentTransList)):
+                tk.Label(recentTrans, text=recentTransList[i]["Reason"]).grid(sticky="W", row=i + 1, column=0)
+                tk.Label(recentTrans, text=recentTransList[i]["Date"]).grid(sticky="W", row=i + 1, column=1)
+                tk.Label(recentTrans, text="$"+str(recentTransList[i]["Balance"])).grid(sticky="W", row=i + 1, column=2)
+                tk.Label(recentTrans, text=recentTransList[i]["Category"]).grid(sticky="W", row=i + 1, column=3)
+                tk.Button(recentTrans, text="View", command=lambda: self.openViewTransactionWin(i)).grid(sticky="W",
                                                                                                      row=i + 1,
-                                                                                                     column=3)  # change i into list of transactions
+                                                                                                     column=4)  # change i into list of transactions
+
+        else:
+            for i in range(10):
+                tk.Label(recentTrans, text=recentTransList[i]["Reason"]).grid(sticky="W", row=i + 1, column=0)
+                tk.Label(recentTrans, text=recentTransList[i]["Date"]).grid(sticky="W", row=i + 1, column=1)
+                tk.Label(recentTrans, text="$" + str(recentTransList[i]["Balance"])).grid(sticky="W", row=i + 1,
+                                                                                          column=2)
+                tk.Label(recentTrans, text=recentTransList[i]["Category"]).grid(sticky="W", row=i + 1, column=3)
+                tk.Button(recentTrans, text="View", command=lambda: self.openViewTransactionWin(i)).grid(sticky="W",
+                                                                                                         row=i + 1,
+                                                                                                         column=4)  # change i into list of transactions
 
         recentTrans.pack()
 
