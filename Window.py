@@ -368,6 +368,21 @@ class Window():
         transactionViewWin.geometry("300x200")
         transactionViewWin.resizable(0, 0)
 
+        if(transaction%2 == 0):
+            tk.Label(transactionViewWin, text = "Group Expense").pack()
+            tk.Label(transactionViewWin, text = "Expense Name: "+"name").pack()
+            tk.Label(transactionViewWin,text = "Date: "+"11/24/2019").pack()
+            tk.Label(transactionViewWin, text = "Value: $"+"300").pack()
+            membersF = tk.LabelFrame(transactionViewWin)
+            tk.Label(membersF,text = "Your Balance: "+"-400").pack()
+            for i in range(3):
+                tk.Label(membersF,text = "Friend "+ str(i)+": "+"+100").pack()
+            membersF.pack()
+        else:
+
+
+
+
         (transactionViewWin).mainloop()
 
     def addNewFriendWin(self,frame):
