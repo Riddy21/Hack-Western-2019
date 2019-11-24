@@ -141,12 +141,17 @@ class Window():
                 "Groceries",
                 "Entertainment"
             ]
-            OPTIONS = [
-                "Group 1",
-                "Group 2",
-                "Group 3",
-                "Group 4"
-            ]  # change to list of friends and groups
+            userGroups = self.dbInterface.find_groups(self.userName) # change to list of friends and groups
+            print(userGroups)
+            a = []
+            groupIDs = []
+            for i in userGroups:
+                a += [i["GroupName"]]
+                groupIDs += [i["GroupID"]]
+            if (not a):
+                a = ["no group"]
+
+            OPTIONS = a
 
             default = tk.StringVar(groupF)
             default.set(OPTIONS[0])  # default value
@@ -160,31 +165,36 @@ class Window():
             tk.Label(groupF,text = "Groups").grid(row=4,column = 0)
             w = tk.OptionMenu(groupF, default, *OPTIONS)
             w.grid(row=4, column =1)
-            tk.Button(groupF, text = "Split Evenly",command = lambda: update()).grid(row =4, column = 2)
-            def update():
-                for i in range(10):  # according to Group getMembers
-                    memberAmount[i].set(str(round(float(amount.get())/10,2)))
+            tk.Button(groupF, text = "Split Evenly",command = lambda: update(userGroups,a,default.get())).grid(row =4, column = 2)
+            tk.Button(groupF, text = "Load Group",command = lambda: drawGroup(groupF,userGroups,groupIDs,a,default.get())).grid(row =3, column = 2)
 
+            def update(userGroups,a,groupName):
+                userGroup = userGroups[a.index(groupName)]
+                for i in range(len(userGroup["Users"])):  # according to Group getMembers
+                    memberAmount[i].set(str(round(float(amount.get())/len(userGroup["Users"]),2)))
 
-
+            userGroup = userGroups[a.index(default.get())]
             groupMembers = tk.LabelFrame(groupF)
 
-            for i in range(10):  # according to Group getMembers
-                memberName = tk.StringVar(groupF, value = "bob") #change to group Member get name
-                memberAmount.append(tk.StringVar(groupF,value = str(round(float(amount.get())/10,2))))
-                tk.Label(groupMembers, text = memberName.get()).grid(row=i, column=0)
-                amEntry = tk.Entry(groupMembers, textvariable=memberAmount[i])
-                amEntry.grid(row=i, column=1)
+            def drawGroup(groupF,userGroups,groupIDs,a,groupName):
+                userGroup = userGroups[a.index(groupName)]
 
-            groupMembers.grid(row = 5, columnspan = 3)
+                for i in range(len(userGroup["Users"])):  # according to Group getMembers
+                    memberName = tk.StringVar(groupF, value = userGroup["Users"][i]) #change to group Member get name
+                    memberAmount.append(tk.StringVar(groupF,value = str(round(float(amount.get())/10,2))))
+                    tk.Label(groupMembers, text = memberName.get()).grid(row=i, column=0)
+                    amEntry = tk.Entry(groupMembers, textvariable=memberAmount[i])
+                    amEntry.grid(row=i, column=1)
 
-            tk.Button(groupF, text="Add", state = "normal", command =lambda: addExpense(groupF, amount,memberAmount)).grid(row=6, column=0) #add function creates expense in database, updates recent expenses and closes window
+            groupMembers.grid(row = 5, columnspan = 2)
+
+            tk.Button(groupF, text="Add", state = "normal", command =lambda: addExpense(groupF, amount,memberAmount,userGroup,a)).grid(row=6, column=0) #add function creates expense in database, updates recent expenses and closes window
             tk.Button(groupF, text="Cancel", command = transactionWin.destroy).grid(row=6, column=1)
 
-            def addExpense(groupF, amount, memberAmount):
+            def addExpense(groupF, amount, memberAmount,userGroup,a):
                 sum = 0
 
-                for i in range(10):  # according to Group getMembers
+                for i in range(len(userGroup["Users"])):  # according to Group getMembers
                     sum += float(memberAmount[i].get())
 
                 if round(sum,2) != round(float(amount.get()),2):
@@ -194,10 +204,34 @@ class Window():
                     time.sleep(1)
                     error.destroy()
                 else:
-                    #save amount for each person
-                    #TODO
-                    self.dbInterface.add_transaction()
-                    transactionWin.destroy()
+                    for i in range(len(userGroup["Users"])):
+                        if userGroup["Users"][i] == self.userName:
+                            Transaction = {
+                                "Balance": sum,
+                                "To/From": "",
+                                "Reason": expName.get(),
+                                "Date": date.today().strftime("%d/%m/%Y"),
+                                "UserName": self.userName,
+                                "GroupID": userGroup["GroupID"],  # 0 signifies that there is no group attached to the transaction
+                                "Category": defaultCat.get()
+                            }
+                            self.dbInterface.add_transaction(Transaction)
+                            self.dbInterface.adjust_userBudget(self.userName,-sum)
+                            self.dbInterface.adjust_groupBudget(userGroup["GroupID"],-sum)
+                        else:
+                            Debt = {
+                                "UserName": userGroup["Users"][i],
+                                "Target": "",
+                                "Balance": memberAmount[i].get(),
+                                "Reason": expName.get(),
+                                "GroupID": userGroup["GroupID"],
+                                "Date": date.today().strftime("%d/%m/%Y"),
+                                "Category": defaultCat.get()
+                            }
+                            self.dbInterface.add_Debt(Debt)
+                            self.dbInterface.adjust_userBudget(userGroup["Users"][i],float(memberAmount[i].get()))
+                self.updateAllFrames()
+                transactionWin.destroy()
 
         def friends(frame, window):
             frame.destroy()
@@ -368,21 +402,6 @@ class Window():
         transactionViewWin.geometry("300x200")
         transactionViewWin.resizable(0, 0)
 
-        if(transaction%2 == 0):
-            tk.Label(transactionViewWin, text = "Group Expense").pack()
-            tk.Label(transactionViewWin, text = "Expense Name: "+"name").pack()
-            tk.Label(transactionViewWin,text = "Date: "+"11/24/2019").pack()
-            tk.Label(transactionViewWin, text = "Value: $"+"300").pack()
-            membersF = tk.LabelFrame(transactionViewWin)
-            tk.Label(membersF,text = "Your Balance: "+"-400").pack()
-            for i in range(3):
-                tk.Label(membersF,text = "Friend "+ str(i)+": "+"+100").pack()
-            membersF.pack()
-        else:
-
-
-
-
         (transactionViewWin).mainloop()
 
     def addNewFriendWin(self,frame):
@@ -413,7 +432,7 @@ class Window():
                 Sum = 0
                 for j in DebtsToYou:
                     if j["UserName"] == listOfFriends[i]:
-                        Sum += j["Balance"]
+                        Sum += float(j["Balance"])
 
             self.dbInterface.addFriend(self.userName,friendName.get())
             window.destroy()
@@ -495,7 +514,7 @@ class Window():
             Sum = 0
             for j in DebtsToYou:
                 if j["UserName"] == listOfFriends[i]:
-                    Sum += j["Balance"]
+                    Sum += float(j["Balance"])
 
             Friend = tk.LabelFrame(allFriends,padx=5 ,pady=10)
             tk.Label(Friend, text="Friend Name: " + listOfFriends[i], pady=10).grid(sticky="W", row=i + 1, column=0) # change i to $ and actual friends
