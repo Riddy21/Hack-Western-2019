@@ -302,7 +302,6 @@ class Window():
             tk.Button(personalF, text="Add",command = lambda:addExpense(amount)).grid(row=3,column=0)  # add function creates expense in database, updates recent expenses and closes window
             tk.Button(personalF, text="Cancel", command=transactionWin.destroy).grid(row=3, column=1)
 
-            #TODO
             def addExpense(amount):
                 Transaction = {
                     "Balance": (round(float(amount.get()), 2)),
@@ -365,9 +364,10 @@ class Window():
             print("printed friend")
             if friend:
                 tk.Label(frame, text="Friend Found!!!!").grid(row=2, column=1)
+                button.config(state="normal")
             else:
                 tk.Label(frame, text="Friend not found").grid(row=2, column=1)
-            button.config(state="normal")
+                button.config(state="disabled")
 
         addfriendWin.mainloop()
         
