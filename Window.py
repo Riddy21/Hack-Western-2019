@@ -89,8 +89,8 @@ class Window():
             frame.destroy()
 
             groupF = tk.Frame(window)
-            expName = tk.StringVar()
-            amount = tk.StringVar()
+            expName = tk.StringVar(groupF)
+            amount = tk.StringVar(groupF,value = "0")
             memberAmount = []
 
 
@@ -114,18 +114,20 @@ class Window():
             default.set(OPTIONS[0])  # default value
 
             w = tk.OptionMenu(groupF, default, *OPTIONS)
-            w.grid(row=2, columnspan = 2)
+            w.grid(row=2, column =0)
+            tk.Button(groupF, text = "Refresh",command = update).
+
+            def update():
+
 
             groupMembers = tk.LabelFrame(groupF)
 
             for i in range(10):  # according to Group getMembers
-                memberName = tk.StringVar() #change to group Member get name
-                memberName.set("bob")
-                memberAmount.append(tk.StringVar())
-                memberAmount[i].set(str(float(int(amount.get()))/10))
+                memberName = tk.StringVar(groupF, value = "bob") #change to group Member get name
+                memberAmount.append(tk.StringVar(groupF,value = str(float(amount.get())/10)))
                 tk.Label(groupMembers, text = memberName.get()).grid(row=i, column=0)
-                unEntry = tk.Entry(groupMembers, textvariable=memberAmount)
-                unEntry.grid(row=i, column=1)
+                amEntry = tk.Entry(groupMembers, textvariable=memberAmount[i])
+                amEntry.grid(row=i, column=1)
 
             groupMembers.grid(row = 3, columnspan = 2)
 
