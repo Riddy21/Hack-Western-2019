@@ -170,16 +170,17 @@ class Window():
 
                 for i in range(10):  # according to Group getMembers
                     sum += float(memberAmount[i].get())
+
                 if round(sum,2) != round(float(amount.get()),2):
                     error = tk.Label(groupF, text="Amount does not add up to total")
                     error.grid(row=5, columnspan=2)
                     error.update()
                     time.sleep(1)
                     error.destroy()
-
-
                 else:
                     #save amount for each person
+                    #TODO
+                    self.dbInterface.add_transaction()
                     transactionWin.destroy()
 
         def friends(frame, window):
@@ -301,6 +302,7 @@ class Window():
             tk.Button(personalF, text="Add",command = lambda:addExpense(amount)).grid(row=3,column=0)  # add function creates expense in database, updates recent expenses and closes window
             tk.Button(personalF, text="Cancel", command=transactionWin.destroy).grid(row=3, column=1)
 
+            #TODO
             def addExpense(amount):
                 Transaction = {
                     "Balance": (round(float(amount.get()), 2)),
@@ -312,6 +314,7 @@ class Window():
                     "Category": category.get()
                 }
                 self.dbInterface.add_transaction(Transaction)
+                self.dbInterface.adjust_userBudget(self.userName,-(round(float(amount.get()), 2)))
                 self.updateAllFrames()
                 transactionWin.destroy()
 
@@ -340,6 +343,7 @@ class Window():
         tk.Entry(NewFriend, textvariable = friendName).grid(row=0, column=1)
         buttonFriend = tk.Button(NewFriend, text="Add Friend",command = lambda: add(addfriendWin, friendName),state = "disabled")
         buttonFriend.grid(row=4, column=0)
+
         tk.Button(NewFriend, text="Cancel",command = lambda: cancel(addfriendWin)).grid(row=4, column=2)
         tk.Button(NewFriend, text="Search Friend", command = lambda: searchFriend(NewFriend,buttonFriend,friendName)).grid(row=1, column=1)
         
@@ -353,9 +357,16 @@ class Window():
             tk.Label(Friend, text="$ " + str(100), pady=10).grid(sticky="W", row=1, column=1)
             Friend.pack()
 
+        #TODO fix adding friends
         def searchFriend(frame, button,name):
             #if not name: return
-            tk.Label(frame, text="Friend Found!").grid(row=2, column=1)
+            friend = self.dbInterface.get_user(name.get())
+            print(friend)
+            print("printed friend")
+            if friend:
+                tk.Label(frame, text="Friend Found!!!!").grid(row=2, column=1)
+            else:
+                tk.Label(frame, text="Friend not found").grid(row=2, column=1)
             button.config(state="normal")
 
         addfriendWin.mainloop()

@@ -174,7 +174,7 @@ class DataBase:
     def adjust_userBudget(self,userName, budget):
         user = self.users.find_one({"UserName": userName})
         user["Budget"] += budget
-        self.users.replace_one({"UserName": userName})
+        self.users.replace_one({"UserName": userName},user)
 
 
     ########################################################################################################################
