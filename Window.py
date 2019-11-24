@@ -167,7 +167,7 @@ class Window():
             w = tk.OptionMenu(groupF, default, *OPTIONS)
             w.grid(row=4, column =1)
             tk.Button(groupF, text = "Split Evenly",command = lambda: update(userGroups,a,default.get())).grid(row =4, column = 2)
-            tk.Button(groupF, text = "Load Group",command = lambda: drawGroup(groupF,userGroups,groupIDs,a,default.get())).grid(row =3, column = 2)
+            tk.Button(groupF, text = "Load Group",command = lambda: drawGroup(groupF,userGroups,groupIDs,a,default)).grid(row =3, column = 2)
 
             def update(userGroups,a,groupName):
                 userGroup = userGroups[a.index(groupName)]
@@ -176,8 +176,10 @@ class Window():
 
             userGroup = userGroups[a.index(default.get())]
             groupMembers = tk.LabelFrame(groupF)
+            groupName = default.get()
 
-            def drawGroup(groupF,userGroups,groupIDs,a,groupName):
+            def drawGroup(groupF,userGroups,groupIDs,a,default):
+                groupName = default.get()
                 userGroup = userGroups[a.index(groupName)]
 
                 for i in range(len(userGroup["Users"])):  # according to Group getMembers
@@ -187,15 +189,20 @@ class Window():
                     amEntry = tk.Entry(groupMembers, textvariable=memberAmount[i])
                     amEntry.grid(row=i, column=1)
 
+            groupName = default.get()
             groupMembers.grid(row = 5, columnspan = 2)
 
-            tk.Button(groupF, text="Add", state = "normal", command =lambda: addExpense(groupF, amount,memberAmount,userGroup,a)).grid(row=6, column=0) #add function creates expense in database, updates recent expenses and closes window
+            tk.Button(groupF, text="Add", state = "normal", command =lambda: addExpense(groupName,groupF, amount,memberAmount,userGroup,a)).grid(row=6, column=0) #add function creates expense in database, updates recent expenses and closes window
             tk.Button(groupF, text="Cancel", command = transactionWin.destroy).grid(row=6, column=1)
 
-            def addExpense(groupF, amount, memberAmount,userGroup,a):
+            def addExpense(groupName,groupF, amount, memberAmount,userGroup,a):
+                print("GroupName" +groupName)
+                print(userGroup)
+                for i in memberAmount:
+                    print(i.get())
                 sum = 0
 
-                for i in range(len(userGroup["Users"])):  # according to Group getMembers
+                for i in range(len(memberAmount)):  # according to Group getMembers
                     sum += float(memberAmount[i].get())
 
                 if round(sum,2) != round(float(amount.get()),2):
@@ -222,15 +229,15 @@ class Window():
                         else:
                             Debt = {
                                 "UserName": userGroup["Users"][i],
-                                "Target": "",
-                                "Balance": memberAmount[i].get(),
+                                "Target": self.userName,
+                                "Balance": round(float(memberAmount[i].get()),2),
                                 "Reason": expName.get(),
                                 "GroupID": userGroup["GroupID"],
                                 "Date": date.today().strftime("%d/%m/%Y"),
                                 "Category": defaultCat.get()
                             }
                             self.dbInterface.add_Debt(Debt)
-                            self.dbInterface.adjust_userBudget(userGroup["Users"][i],float(memberAmount[i].get()))
+                            self.dbInterface.adjust_userBudget(userGroup["Users"][i],-float(memberAmount[i].get()))
                 self.updateAllFrames()
                 transactionWin.destroy()
 
@@ -502,12 +509,17 @@ class Window():
                     allFriends = tk.LabelFrame(NewGroup, padx=5, pady=10)
                     tk.Label(allFriends, text=groupMembers[i], padx = 10).pack()
                     allFriends.grid(row=3+i, columnspan = 3)
-        tk.Button(NewGroup, text="Create Group", command = lambda: createGroup()).grid(row=2, columnspan = 2)
+        tk.Button(NewGroup, text="Create Group", command = lambda: createGroup(groupName,groupMembers)).grid(row=2, columnspan = 2)
 
-        def createGroup():
-            #TODO: create a group using specified parameters and pass in nessesary variables
+        def createGroup(groupName,groupMembers):
+            Group = {
+                "GroupName": groupName.get(),
+                "Users": groupMembers,
+                "Budget": 800  #Standard 800$
+            }
+            self.dbInterface.create_group(Group)
+            self.updateAllFrames()
             addGroupWin.destroy()
-
 
         addGroupWin.mainloop()
 
@@ -522,15 +534,14 @@ class Window():
         tk.Button(self.friendsFrame, text="+",state = "normal",command=lambda: self.addNewFriendWin(allFriends)).pack()
         tk.Button(self.friendsFrame, text="Back",state = "normal",command=lambda: self.switchFrame(self.mainFrame,self.friendsFrame)).pack(side="bottom")
 
-       #TODO replace friends list here
 
         listOfFriends = self.dbInterface.getFriendsList(self.userName)
+        DebtsToYou = self.dbInterface.get_owes(self.userName)
         for i in range(len(listOfFriends)):
-            DebtsToYou = self.dbInterface.get_owes(self.userName)
             Sum = 0
             for j in DebtsToYou:
                 if j["UserName"] == listOfFriends[i]:
-                    Sum += float(j["Balance"])
+                        Sum += float(j["Balance"])
 
             Friend = tk.LabelFrame(allFriends,padx=5 ,pady=10)
             tk.Label(Friend, text="Friend Name: " + listOfFriends[i], pady=10).grid(sticky="W", row=i + 1, column=0) # change i to $ and actual friends
@@ -549,13 +560,16 @@ class Window():
 
         allGroups = tk.LabelFrame(self.groupsFrame, pady=5, padx=5)
         # replace i with list of recent transactinos
-        for i in range(3):
+        UsersGroups = self.dbInterface.find_groups(self.userName)
+
+        for i in range(len(UsersGroups)):
             GroupFr = tk.LabelFrame(allGroups,padx=5)
             
-            tk.Label(GroupFr, text="Group Name: " + str(i), pady=10).grid(sticky="W", row=0, column=0) # change i to $ and actual groups
+            tk.Label(GroupFr, text="Group Name: " + UsersGroups[i]["GroupName"], pady=10).grid(sticky="W", row=0, column=0) # change i to $ and actual groups
             tk.Button(GroupFr, text="Details",state = "normal",command=lambda: self.switchFrame(self.membersFrame,self.groupsFrame)).grid(sticky="W", row=0, column=2)
             Group = tk.LabelFrame(GroupFr,padx=5)
-            tk.Label(Group, text="$" + str(i), pady=10).grid(sticky="W", row=i + 1, column=0,padx=(0,25))
+
+            tk.Label(Group, text="$" + str(UsersGroups[i]["Budget"]), pady=10).grid(sticky="W", row=i + 1, column=0,padx=(0,25))
             for j in range(3):
                 tk.Label(Group, text="M" + str(j), pady=10).grid(sticky="W", row=i+1, column=j+1)
             Group.grid(sticky="W", row=i + 2, column=0)
