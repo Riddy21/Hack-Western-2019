@@ -2,6 +2,9 @@ import tkinter as tk
 import time
 from datetime import date
 import DataBase as mdb
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import (
+    FigureCanvasTkAgg)
 
 class Window():
     def __init__(self,butt):
@@ -150,9 +153,6 @@ class Window():
 
             OPTIONS = a
 
-
-
-
             default = tk.StringVar(groupF)
             default.set(OPTIONS[0])  # default value
 
@@ -167,7 +167,6 @@ class Window():
             w.grid(row=4, column =1)
             tk.Button(groupF, text = "Split Evenly",command = lambda: update(userGroups,a,default.get())).grid(row =4, column = 2)
             tk.Button(groupF, text = "Load Group",command = lambda: drawGroup(groupF,userGroups,groupIDs,a,default.get())).grid(row =3, column = 2)
-
 
             def update(userGroups,a,groupName):
                 userGroup = userGroups[a.index(groupName)]
@@ -222,7 +221,7 @@ class Window():
                         else:
                             Debt = {
                                 "UserName": userGroup["Users"][i],
-                                "Target": self.userName ,
+                                "Target": "",
                                 "Balance": memberAmount[i].get(),
                                 "Reason": expName.get(),
                                 "GroupID": userGroup["GroupID"],
@@ -233,7 +232,6 @@ class Window():
                             self.dbInterface.adjust_userBudget(userGroup["Users"][i],float(memberAmount[i].get()))
                 self.updateAllFrames()
                 transactionWin.destroy()
-
 
         def friends(frame, window):
             frame.destroy()
@@ -345,6 +343,7 @@ class Window():
                         }
                         self.dbInterface.add_Debt(Debt)
                         self.dbInterface.adjust_userBudget(members[i],-int(float(memberAmount[i].get())))
+                    self.updateAllFrames()
                     transactionWin.destroy()
 
         def personal(frame, window):
@@ -382,7 +381,7 @@ class Window():
             def addExpense(amount):
                 Transaction = {
                     "Balance": (round(float(amount.get()), 2)),
-                    "To/From": "",
+                    "To/From": self.userName,
                     "Reason": expName.get(),
                     "Date": date.today().strftime("%d/%m/%Y"),
                     "UserName": self.userName,
@@ -433,7 +432,7 @@ class Window():
                 Sum = 0
                 for j in DebtsToYou:
                     if j["UserName"] == listOfFriends[i]:
-                        Sum += j["Balance"]
+                        Sum += float(j["Balance"])
 
             self.dbInterface.addFriend(self.userName,friendName.get())
             window.destroy()
@@ -464,43 +463,35 @@ class Window():
         addGroupWin.geometry("300x400")
         addGroupWin.resizable(0, 0)
 
-        groupName = tk.StringVar(addGroupWin)
-
         NewGroup = tk.Frame(addGroupWin)
         NewGroup.pack()
+
+        OPTIONS = self.dbInterface.getFriendsList(self.userName)  # change to list of friends and groups
+        OPTIONS.insert(0, self.userName)
+        groupName = tk.StringVar(NewGroup)
+        groupFriend = tk.StringVar(NewGroup, value = OPTIONS[0])
+        groupMembers = []
 
         tk.Label(NewGroup, text="Group Name: ").grid(row=0, column=0)
         tk.Entry(NewGroup, textvariable=groupName).grid(row=0, column=1)
 
-        friendsListGroup = dict()
+        w = tk.OptionMenu(NewGroup, groupFriend, *OPTIONS)
+        w.grid(row=1, column=0)
+        tk.Button(NewGroup, text="Add Friend", command=lambda: addFriendtoList()).grid(row=1, column=1)
 
-        # replace i with list of friends
-        allFriends = tk.LabelFrame(NewGroup, padx=5, pady=10)
-        allFriends.grid(row=2, column=1)
+        def addFriendtoList():
+            if (groupFriend.get() in groupMembers) == False:
+                groupMembers.append(groupFriend.get())
+                for i in range(len(groupMembers)):  # according to Group getMembers
+                    allFriends = tk.LabelFrame(NewGroup, padx=5, pady=10)
+                    tk.Label(allFriends, text=groupMembers[i], padx = 10).pack()
+                    allFriends.grid(row=3+i, columnspan = 3)
+        tk.Button(NewGroup, text="Create Group", command = lambda: createGroup()).grid(row=2, columnspan = 2)
 
-        length = 3  # length of the entries of friends
-        checkValArr = []
+        def createGroup():
+            #TODO: create a group using specified parameters and pass in nessesary variables
+            addGroupWin.destroy()
 
-        for i in range(0, length):
-            friendName = "Just in Bieber " + str(i)  # always change this to next friend
-            checkValArr.append(tk.IntVar(addGroupWin, 0))
-            Friend = tk.LabelFrame(allFriends, padx=5, pady=10)
-            Friend.grid(row=i, column=0)
-            tk.Label(Friend, text=friendName, pady=10).grid(sticky="W", row=0, column=0)
-            tk.Checkbutton(Friend, variable=checkValArr[i], onvalue=i, offvalue=-1,
-                           command=lambda: changeFriendToGroup(friendsListGroup, friendName, i, checkValArr)).grid(
-                sticky="W", row=0, column=1)
-
-        def changeFriendToGroup(arr, friendName, idx, valArr):
-            if valArr[idx].get() != -1:
-                arr[friendName] = True
-            else:
-                if friendName in arr:
-                    del (arr[friendName])
-            print(arr)
-            print(valArr)
-            print(idx)
-            print(valArr[idx].get())
 
         addGroupWin.mainloop()
 
@@ -513,6 +504,7 @@ class Window():
         allFriends = tk.LabelFrame(self.friendsFrame, pady=5, padx=5)
 
         tk.Button(self.friendsFrame, text="+",state = "normal",command=lambda: self.addNewFriendWin(allFriends)).pack()
+        tk.Button(self.friendsFrame, text="Back",state = "normal",command=lambda: self.switchFrame(self.mainFrame,self.friendsFrame)).pack(side="bottom")
 
        #TODO replace friends list here
 
@@ -522,7 +514,7 @@ class Window():
             Sum = 0
             for j in DebtsToYou:
                 if j["UserName"] == listOfFriends[i]:
-                    Sum += int(float(j["Balance"]))
+                    Sum += float(j["Balance"])
 
             Friend = tk.LabelFrame(allFriends,padx=5 ,pady=10)
             tk.Label(Friend, text="Friend Name: " + listOfFriends[i], pady=10).grid(sticky="W", row=i + 1, column=0) # change i to $ and actual friends
@@ -537,23 +529,64 @@ class Window():
         NavBar.pack()
 
         tk.Button(self.groupsFrame, text="+",state = "normal",command=lambda: self.addNewGroupWin()).pack()
+        tk.Button(self.groupsFrame, text="Back",state = "normal",command=lambda: self.switchFrame(self.mainFrame,self.groupsFrame)).pack(side="bottom")
 
         allGroups = tk.LabelFrame(self.groupsFrame, pady=5, padx=5)
         # replace i with list of recent transactinos
         for i in range(3):
             GroupFr = tk.LabelFrame(allGroups,padx=5)
             
-            tk.Label(GroupFr, text="Group Name: " + str(i), pady=10).grid(sticky="W", row=i + 1, column=0) # change i to $ and actual groups
+            tk.Label(GroupFr, text="Group Name: " + str(i), pady=10).grid(sticky="W", row=0, column=0) # change i to $ and actual groups
+            tk.Button(GroupFr, text="Details",state = "normal",command=lambda: self.switchFrame(self.membersFrame,self.groupsFrame)).grid(sticky="W", row=0, column=2)
             Group = tk.LabelFrame(GroupFr,padx=5)
-            tk.Label(Group, text="$ " + str(i), pady=10).grid(sticky="W", row=i + 1, column=0)
+            tk.Label(Group, text="$" + str(i), pady=10).grid(sticky="W", row=i + 1, column=0,padx=(0,25))
             for j in range(3):
-                tk.Label(Group, text="M " + str(j), pady=10).grid(sticky="W", row=0, column=j+1)
+                tk.Label(Group, text="M" + str(j), pady=10).grid(sticky="W", row=i+1, column=j+1)
             Group.grid(sticky="W", row=i + 2, column=0)
             GroupFr.pack()
         allGroups.pack()
 
     def populateMembers(self):
-        tk.Label(self.membersFrame, text="empty").pack()
+        tk.Label(self.membersFrame, text="Group Budget: $232.34").pack() #mocking members up
+        youFr = tk.LabelFrame(self.membersFrame,pady = 5,padx=5)
+        youFr.pack()
+        tk.Label(youFr, text="You").grid(row = 1, column = 0, padx=(0,25))
+        tk.Label(youFr, text="Amount Owed").grid(row = 0, column = 2)
+        tk.Label(youFr, text="$90.99").grid(row = 1, column = 2)
+
+        memFr = tk.LabelFrame(self.membersFrame,pady = 15,padx=5)
+        memFr.pack()
+
+        for i in range(3):
+            MemberFr = tk.LabelFrame(memFr,pady = 5,padx=5)
+            MemberFr.pack()
+            tk.Label(MemberFr, text="M" + str(i)).grid(row = 1, column = 0, padx=(0,25))
+            tk.Label(MemberFr, text="Amount Owed").grid(row = 0, column = 2)
+            tk.Label(MemberFr, text="$30.33").grid(row = 1, column = 2)
+        
+        tk.Button(self.membersFrame, text="Back",state = "normal",command=lambda: self.switchFrame(self.groupsFrame,self.membersFrame)).pack(side="bottom")
 
     def populateProfile(self):
-        tk.Label(self.profileFrame, text="empty").pack()
+        labels = 'Groceries', 'Bills', 'Gifts', 'Housing'
+        sizes = [15, 30, 45, 10]
+        data = {"N18": 10, "N19": 15, "N20": 5, "N21": 20, "N22": 66, "N23": 100, "N21": 24}
+        dates = list(data.keys())
+        expenses = list(data.values())
+
+        fig, axs = plt.subplots(figsize=(2, 2))
+        axs.bar(dates, expenses)
+        fig.suptitle('Daily Spending')
+
+        fig1, axs1 = plt.subplots(figsize=(2, 2))
+        axs1.pie(sizes, labels=labels, autopct='%1.1f%%',
+        shadow=True, startangle=90)
+        axs1.axis('equal')
+        fig1.suptitle('Category')
+
+        canvas = FigureCanvasTkAgg(fig, master=self.profileFrame)  # A tk.DrawingArea.
+        canvas.draw()
+        canvas.get_tk_widget().grid(row = 0,column = 0)
+        canvas1 = FigureCanvasTkAgg(fig1, master=self.profileFrame)  # A tk.DrawingArea.
+        canvas1.draw()
+        canvas1.get_tk_widget().grid(row = 0,column = 1)
+        tk.Button(self.profileFrame, text="Back", command = lambda: self.switchFrame(self.mainFrame,self.profileFrame)).grid(row=1, columnspan = 2)
