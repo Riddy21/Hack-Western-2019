@@ -555,7 +555,9 @@ class Window():
             tk.Label(GroupFr, text="Group Name: " + str(i), pady=10).grid(sticky="W", row=0, column=0) # change i to $ and actual groups
             tk.Button(GroupFr, text="Details",state = "normal",command=lambda: self.switchFrame(self.membersFrame,self.groupsFrame)).grid(sticky="W", row=0, column=2)
             Group = tk.LabelFrame(GroupFr,padx=5)
+            tk.Label(Group, text="Your Balence:", pady=10).grid(sticky="W", row=i, column=0,padx=(0,25))
             tk.Label(Group, text="$" + str(i), pady=10).grid(sticky="W", row=i + 1, column=0,padx=(0,25))
+            tk.Label(Group, text="Members:", pady=10).grid(sticky="W", row=i, column=1, columnspan = 3)
             for j in range(3):
                 tk.Label(Group, text="M" + str(j), pady=10).grid(sticky="W", row=i+1, column=j+1)
             Group.grid(sticky="W", row=i + 2, column=0)
