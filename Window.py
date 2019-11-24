@@ -1,10 +1,15 @@
 import tkinter as tk
 import time
-
+from datetime import date
+import DataBase as mdb
+import Login
 
 class Window():
-    def __init__(self):
+    def __init__(self,butt):
+        self.userName = butt
+
         # Setup window
+        self.dbInterface = mdb.DataBase()
         self.window = tk.Tk()
 
         self.monthlyBudget = tk.StringVar()
@@ -39,7 +44,8 @@ class Window():
         frame.pack()
 
     def populateMain(self):
-        self.monthlyBudget.set("500")
+
+        self.monthlyBudget.set(self.dbInterface.get_user(self.userName)["Budget"])
         tk.Label(self.mainFrame, text="Your Monthly Budget is:").pack()
         tk.Label(self.mainFrame, text=self.monthlyBudget.get()).pack()
         tk.Button(self.mainFrame, text="Add a Transaction", command=self.openTransactionWin).pack()
@@ -61,6 +67,7 @@ class Window():
         tk.Label(recentTrans, text="Date", pady=10).grid(sticky="W", row=0, column=1)
         tk.Label(recentTrans, text="Amount", pady=10).grid(sticky="W", row=0, column=2)
 
+        #TODO
         # replace i with list of recent transactinos
         for i in range(10):
             tk.Label(recentTrans, text="Amazon").grid(sticky="W", row=i + 1, column=0)
@@ -261,7 +268,7 @@ class Window():
             frame.destroy()
 
             personalF = tk.Frame(window)
-            expName = tk.StringVar()
+            expName = tk.StringVar(personalF)
             amount = tk.StringVar(personalF, value = "0")
 
             personalF.pack()
@@ -290,8 +297,17 @@ class Window():
             tk.Button(personalF, text="Cancel", command=transactionWin.destroy).grid(row=3, column=1)
 
             def addExpense(amount):
-                #save amount for each  *remember to round
-                print(round(float(amount.get()), 2))
+                Transaction = {
+                    "Balance": (round(float(amount.get()), 2)),
+                    "To/From": self.userName,
+                    "Reason": expName.get(),
+                    "Date": date.today().strftime("%d/%m/%Y"),
+                    "UserName": self.userName,
+                    "GroupID":0,
+                    "Category": category.get()
+                }
+                self.dbInterface.add_transaction(Transaction)
+
                 transactionWin.destroy()
 
 

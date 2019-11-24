@@ -322,7 +322,8 @@ class DataBase:
         "Reason": "McDonalds",
         "Date": date.today().strftime("%d/%m/%Y"),
         "UserName": "DanielLu",
-        "GroupID": 0  # 0 signifies that there is no group attached to the transaction
+        "GroupID": 0,  # 0 signifies that there is no group attached to the transaction
+        "Category": 
     }
 
     demoGroup = {
