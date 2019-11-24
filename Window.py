@@ -312,7 +312,7 @@ class Window():
                         }
                         self.dbInterface.add_Debt(Debt)
                         self.dbInterface.adjust_userBudget(members[i],-int(float(memberAmount[i].get())))
-                        self.updateAllFrames()
+                    self.updateAllFrames()
                     transactionWin.destroy()
 
         def personal(frame, window):
