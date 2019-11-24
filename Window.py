@@ -3,6 +3,12 @@ import time
 from datetime import date
 import DataBase as mdb
 
+from matplotlib.backends.backend_tkagg import (
+    FigureCanvasTkAgg, NavigationToolbar2Tk)
+# Implement the default Matplotlib key bindings.
+from matplotlib.backend_bases import key_press_handler
+from matplotlib.figure import Figure
+
 class Window():
     def __init__(self,butt):
         self.userName = butt
@@ -306,6 +312,7 @@ class Window():
                         }
                         self.dbInterface.add_Debt(Debt)
                         self.dbInterface.adjust_userBudget(members[i],-int(float(memberAmount[i].get())))
+                        self.updateAllFrames()
                     transactionWin.destroy()
 
         def personal(frame, window):
