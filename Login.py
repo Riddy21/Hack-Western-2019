@@ -1,9 +1,11 @@
 import tkinter as tk
 import Window
+import DataBase as mdb
 
 class Login():
     def __init__(self):
         # Setup window
+        self.dbInterface = mdb.DataBase()
         self.window = tk.Tk()
         self.username = tk.StringVar()
         self.password = tk.StringVar()
@@ -28,8 +30,15 @@ class Login():
         tk.Button(self.loginFrame,text = "Login", command = self.Login).grid(row = 2, column = 0)
         tk.Button(self.loginFrame,text = "Register").grid(row = 2, column = 1)
     def Login(self):
-        self.window.destroy()
-        print(self.username.get())
-        print(self.password.get())
-        Window.Window()
+        user = self.dbInterface.get_user(self.username.get())
+        if (not user):
+            raise("User is not regestered")
+        else:
+            if user["password"] != self.password.get():
+                raise("password is wrong")
+            else:
+                self.window.destroy()
+                print(self.username.get())
+                print(self.password.get())
+                Window.Window()
 

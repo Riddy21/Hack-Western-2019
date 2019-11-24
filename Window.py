@@ -1,4 +1,5 @@
 import tkinter as tk
+import time
 
 
 class Window():
@@ -83,7 +84,7 @@ class Window():
         tk.Label(transType, text="What kind of transaction?").pack()
         tk.Button(transType, text="Personal", command=lambda: personal(transType, transactionWin)).pack(side="left")
         tk.Button(transType, text="Group", command=lambda: group(transType, transactionWin)).pack(side="left")
-        tk.Button(transType, text="Friends", command=lambda: group(transType, transactionWin)).pack(side="left")
+        tk.Button(transType, text="Friends", command=lambda: friends(transType, transactionWin)).pack(side="left")
 
         def group(frame, window):
             frame.destroy()
@@ -102,7 +103,14 @@ class Window():
             unEntry.grid(row=0, column=1)
             pwEntry = tk.Entry(groupF, textvariable=amount)
             pwEntry.grid(row=1, column=1)
-
+            CATEGORIES = [
+                "Bills",
+                "Housing",
+                "Transportation",
+                "Gifts",
+                "Groceries",
+                "Entertainment"
+            ]
             OPTIONS = [
                 "Group 1",
                 "Group 2",
@@ -113,39 +121,147 @@ class Window():
             default = tk.StringVar(groupF)
             default.set(OPTIONS[0])  # default value
 
-            w = tk.OptionMenu(groupF, default, *OPTIONS)
-            w.grid(row=2, column =0)
-            tk.Button(groupF, text = "Split Evenly",command = lambda: update()).grid(row =2, column = 1)
+            defaultCat = tk.StringVar(groupF)
+            defaultCat.set(CATEGORIES[0])
 
+            x = tk.OptionMenu(groupF,defaultCat,*CATEGORIES)
+            x.grid(row = 3, column = 1)
+            tk.Label(groupF,text = "Categories").grid(row = 3,column = 0)
+            tk.Label(groupF,text = "Groups").grid(row=4,column = 0)
+            w = tk.OptionMenu(groupF, default, *OPTIONS)
+            w.grid(row=4, column =1)
+            tk.Button(groupF, text = "Split Evenly",command = lambda: update()).grid(row =4, column = 2)
             def update():
                 for i in range(10):  # according to Group getMembers
-                    memberAmount[i].set(str(float(amount.get()) / 10))
+                    memberAmount[i].set(str(round(float(amount.get())/10,2)))
+
 
 
             groupMembers = tk.LabelFrame(groupF)
 
             for i in range(10):  # according to Group getMembers
                 memberName = tk.StringVar(groupF, value = "bob") #change to group Member get name
-                memberAmount.append(tk.StringVar(groupF,value = str(float(amount.get())/10)))
+                memberAmount.append(tk.StringVar(groupF,value = str(round(float(amount.get())/10,2))))
                 tk.Label(groupMembers, text = memberName.get()).grid(row=i, column=0)
                 amEntry = tk.Entry(groupMembers, textvariable=memberAmount[i])
                 amEntry.grid(row=i, column=1)
 
-            groupMembers.grid(row = 3, columnspan = 2)
+            groupMembers.grid(row = 5, columnspan = 3)
 
-            sum = 0
-            for i in range(10):  # according to Group getMembers
-                sum += float(memberAmount[i].get())
+            tk.Button(groupF, text="Add", state = "normal", command =lambda: addExpense(groupF, amount,memberAmount)).grid(row=6, column=0) #add function creates expense in database, updates recent expenses and closes window
+            tk.Button(groupF, text="Cancel", command = transactionWin.destroy).grid(row=6, column=1)
 
-            tk.Button(groupF, text="Add").grid(row=4, column=0) #add function creates expense in database, updates recent expenses and closes window
-            tk.Button(groupF, text="Cancel", command = transactionWin.destroy).grid(row=4, column=1)
+            def addExpense(groupF, amount, memberAmount):
+                sum = 0
+
+                for i in range(10):  # according to Group getMembers
+                    sum += float(memberAmount[i].get())
+                if round(sum,2) != round(float(amount.get()),2):
+                    error = tk.Label(groupF, text="Amount does not add up to total")
+                    error.grid(row=5, columnspan=2)
+                    error.update()
+                    time.sleep(1)
+                    error.destroy()
+
+
+                else:
+                    #save amount for each person
+                    transactionWin.destroy()
+
+        def friends(frame, window):
+            frame.destroy()
+
+            friendF = tk.Frame(window)
+            expName = tk.StringVar(friendF)
+            amount = tk.StringVar(friendF,value = "0")
+            global memberAmount
+            memberAmount= []
+            members = []
+            
+            friendF.pack()
+
+            tk.Label(friendF, text="Expense Name").grid(row=0, column=0)
+            tk.Label(friendF, text="Amount").grid(row=1, column=0)
+            unEntry = tk.Entry(friendF, textvariable=expName)
+            unEntry.grid(row=0, column=1)
+            pwEntry = tk.Entry(friendF, textvariable=amount)
+            pwEntry.grid(row=1, column=1)
+
+            CATEGORIES = [
+                "Bills",
+                "Housing",
+                "Transportation",
+                "Gifts",
+                "Groceries",
+                "Entertainment"
+            ]
+            OPTIONS = [
+                "Friend 1",
+                "Friend 2",
+                "Friend 3",
+                "Friend 4"
+            ]  # change to list of friends and groups
+
+            friendChoose = tk.StringVar(friendF)
+            friendChoose.set(OPTIONS[0])  # default value
+
+            category = tk.StringVar(friendF)
+            category.set(CATEGORIES[0])
+
+            x = tk.OptionMenu(friendF, category, *CATEGORIES)
+            x.grid(row=2, column = 1)
+            w = tk.OptionMenu(friendF, friendChoose, *OPTIONS)
+            w.grid(row=2, column=0)
+            tk.Button(friendF, text = "Add Friend",command = lambda: addFriendtoList()).grid(row =3, column = 0)
+            tk.Button(friendF, text = "Split Evenly",command = lambda: update()).grid(row =3, column = 1)
+            def update():
+                for i in range(len(members)):  # according to Group getMembers
+                    memberAmount[i].set(str(round(float(amount.get())/len(members),2)))
+
+            def addFriendtoList():
+                if (friendChoose.get() in members) == False:
+                    members.append(friendChoose.get())
+                    global memberAmount
+                    memberAmount = []
+                    print(len(members))
+                    for i in range(len(members)):  # according to Group getMembers
+                        memberName = tk.StringVar(friendF, value=members[i])  # change to group Member get name
+                        memberAmount.append(
+                            tk.StringVar(friendF, value=str(round(float(amount.get()) / len(members), 2))))
+                        tk.Label(groupMembers, text=memberName.get()).grid(row=i, column=0)
+                        amEntry = tk.Entry(groupMembers, textvariable=memberAmount[i])
+                        amEntry.grid(row=i, column=1)
+
+            groupMembers = tk.LabelFrame(friendF)
+            groupMembers.grid(row = 4, columnspan = 2)
+
+            tk.Button(friendF, text="Add", state = "normal", command =lambda: addExpense(friendF, amount,memberAmount)).grid(row=5, column=0) #add function creates expense in database, updates recent expenses and closes window
+            tk.Button(friendF, text="Cancel", command = transactionWin.destroy).grid(row=5, column=1)
+
+            def addExpense(friendF, amount, memberAmount):
+                sum = 0
+
+                for i in memberAmount:  # according to Group getMembers
+                    sum += float(i.get())
+
+                if round(sum,2) != round(float(amount.get()),2):
+                    error = tk.Label(friendF, text="Amount does not add up to total")
+                    error.grid(row=6, columnspan=2)
+                    error.update()
+                    time.sleep(1)
+                    error.destroy()
+
+
+                else:
+                    #save amount for each person
+                    transactionWin.destroy()
 
         def personal(frame, window):
             frame.destroy()
 
             personalF = tk.Frame(window)
             expName = tk.StringVar()
-            amount = tk.StringVar()
+            amount = tk.StringVar(personalF, value = "0")
 
             personalF.pack()
 
@@ -155,8 +271,28 @@ class Window():
             unEntry.grid(row=0, column=1)
             pwEntry = tk.Entry(personalF, textvariable=amount)
             pwEntry.grid(row=1, column=1)
-            tk.Button(personalF, text="Add").grid(row=2,column=0)  # add function creates expense in database, updates recent expenses and closes window
-            tk.Button(personalF, text="Cancel", command=transactionWin.destroy).grid(row=2, column=1)
+
+            CATEGORIES = [
+                "Bills",
+                "Housing",
+                "Transportation",
+                "Gifts",
+                "Groceries",
+                "Entertainment"
+            ]
+            category = tk.StringVar(personalF)
+            category.set(CATEGORIES[0])
+            tk.Label(personalF,text="Category").grid(row=2,column = 0)
+            x = tk.OptionMenu(personalF, category, *CATEGORIES)
+            x.grid(row=2, column=1)
+            tk.Button(personalF, text="Add",command = lambda:addExpense(amount)).grid(row=3,column=0)  # add function creates expense in database, updates recent expenses and closes window
+            tk.Button(personalF, text="Cancel", command=transactionWin.destroy).grid(row=3, column=1)
+
+            def addExpense(amount):
+                #save amount for each  *remember to round
+                print(round(float(amount.get()), 2))
+                transactionWin.destroy()
+
 
         transactionWin.mainloop()
 
