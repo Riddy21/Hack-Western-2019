@@ -2,7 +2,6 @@ import tkinter as tk
 import time
 from datetime import date
 import DataBase as mdb
-import Login
 
 class Window():
     def __init__(self,butt):
