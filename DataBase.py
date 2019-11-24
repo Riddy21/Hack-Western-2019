@@ -174,7 +174,7 @@ class DataBase:
     def adjust_userBudget(self,userName, budget):
         user = self.users.find_one({"UserName": userName})
         user["Budget"] += budget
-        self.users.replace_one({"UserName": userName})
+        self.users.replace_one({"UserName": userName},user)
 
 
     ########################################################################################################################
@@ -269,7 +269,7 @@ class DataBase:
 
     # Gets List of friends from user
     def getFriendsList(self,userName):
-        return self.friendsList.find_one({"Owner": userName})
+        return self.friendsList.find_one({"Owner": userName})["Friends"]
 
 
     # Adds two friends to each other's friends list <3
@@ -322,7 +322,8 @@ class DataBase:
         "Reason": "McDonalds",
         "Date": date.today().strftime("%d/%m/%Y"),
         "UserName": "DanielLu",
-        "GroupID": 0  # 0 signifies that there is no group attached to the transaction
+        "GroupID": 0,  # 0 signifies that there is no group attached to the transaction
+        "Category": 
     }
 
     demoGroup = {

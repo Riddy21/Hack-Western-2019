@@ -1,10 +1,14 @@
 import tkinter as tk
 import time
-
+from datetime import date
+import DataBase as mdb
 
 class Window():
-    def __init__(self):
+    def __init__(self,butt):
+        self.userName = butt
+
         # Setup window
+        self.dbInterface = mdb.DataBase()
         self.window = tk.Tk()
 
         self.monthlyBudget = tk.StringVar()
@@ -34,12 +38,34 @@ class Window():
         self.switchFrame(self.mainFrame, self.holdFrame)
         (self.window).mainloop()
 
+    def updateAllFrames(self):
+        self.mainFrame.destroy()
+        self.groupsFrame.destroy()
+        self.membersFrame.destroy()
+        self.profileFrame.destroy()
+        self.friendsFrame.destroy()
+
+        self.mainFrame = tk.Frame(self.window)
+        self.groupsFrame = tk.Frame(self.window)
+        self.membersFrame = tk.Frame(self.window)
+        self.profileFrame = tk.Frame(self.window)
+        self.friendsFrame = tk.Frame(self.window)
+
+        self.populateMain()
+        self.populateFriends()
+        self.populateGroups()
+        self.populateMembers()
+        self.populateProfile()
+
+        self.switchFrame(self.mainFrame, self.holdFrame)
+
     def switchFrame(self, frame, prevFrame):
         prevFrame.pack_forget()
         frame.pack()
 
     def populateMain(self):
-        self.monthlyBudget.set("500")
+
+        self.monthlyBudget.set(self.dbInterface.get_user(self.userName)["Budget"])
         tk.Label(self.mainFrame, text="Your Monthly Budget is:").pack()
         tk.Label(self.mainFrame, text=self.monthlyBudget.get()).pack()
         tk.Button(self.mainFrame, text="Add a Transaction", command=self.openTransactionWin).pack()
@@ -61,6 +87,7 @@ class Window():
         tk.Label(recentTrans, text="Date", pady=10).grid(sticky="W", row=0, column=1)
         tk.Label(recentTrans, text="Amount", pady=10).grid(sticky="W", row=0, column=2)
 
+        #TODO
         # replace i with list of recent transactinos
         for i in range(10):
             tk.Label(recentTrans, text="Amazon").grid(sticky="W", row=i + 1, column=0)
@@ -156,16 +183,17 @@ class Window():
 
                 for i in range(10):  # according to Group getMembers
                     sum += float(memberAmount[i].get())
+
                 if round(sum,2) != round(float(amount.get()),2):
                     error = tk.Label(groupF, text="Amount does not add up to total")
                     error.grid(row=5, columnspan=2)
                     error.update()
                     time.sleep(1)
                     error.destroy()
-
-
                 else:
                     #save amount for each person
+                    #TODO
+                    self.dbInterface.add_transaction()
                     transactionWin.destroy()
 
         def friends(frame, window):
@@ -251,16 +279,15 @@ class Window():
                     time.sleep(1)
                     error.destroy()
 
-
                 else:
-                    #save amount for each person
+                    #TODO:Add a transaction between all
                     transactionWin.destroy()
 
         def personal(frame, window):
             frame.destroy()
 
             personalF = tk.Frame(window)
-            expName = tk.StringVar()
+            expName = tk.StringVar(personalF)
             amount = tk.StringVar(personalF, value = "0")
 
             personalF.pack()
@@ -289,8 +316,18 @@ class Window():
             tk.Button(personalF, text="Cancel", command=transactionWin.destroy).grid(row=3, column=1)
 
             def addExpense(amount):
-                #save amount for each  *remember to round
-                print(round(float(amount.get()), 2))
+                Transaction = {
+                    "Balance": (round(float(amount.get()), 2)),
+                    "To/From": self.userName,
+                    "Reason": expName.get(),
+                    "Date": date.today().strftime("%d/%m/%Y"),
+                    "UserName": self.userName,
+                    "GroupID":0,
+                    "Category": category.get()
+                }
+                self.dbInterface.add_transaction(Transaction)
+                self.dbInterface.adjust_userBudget(self.userName,-(round(float(amount.get()), 2)))
+                self.updateAllFrames()
                 transactionWin.destroy()
 
 
@@ -318,6 +355,7 @@ class Window():
         tk.Entry(NewFriend, textvariable = friendName).grid(row=0, column=1)
         buttonFriend = tk.Button(NewFriend, text="Add Friend",command = lambda: add(addfriendWin, friendName),state = "disabled")
         buttonFriend.grid(row=4, column=0)
+
         tk.Button(NewFriend, text="Cancel",command = lambda: cancel(addfriendWin)).grid(row=4, column=2)
         tk.Button(NewFriend, text="Search Friend", command = lambda: searchFriend(NewFriend,buttonFriend,friendName)).grid(row=1, column=1)
         
@@ -325,6 +363,7 @@ class Window():
             window.destroy()
 
         def add(window,friendName):
+            self.dbInterface.addFriend(self.userName,friendName.get())
             window.destroy()
             Friend = tk.LabelFrame(frame,padx=5 ,pady=10)
             tk.Label(Friend, text=friendName.get(), pady=10).grid(sticky="W", row=1, column=0) # change i to $ and actual friends
@@ -333,8 +372,17 @@ class Window():
 
         def searchFriend(frame, button,name):
             #if not name: return
-            tk.Label(frame, text="Friend Found!").grid(row=2, column=1)
-            button.config(state="normal")
+            friend = self.dbInterface.get_user(name.get())
+            if friend:
+                if friend["UserName"] in self.dbInterface.getFriendsList(self.userName):
+                    tk.Label(frame, text="Already Friends!").grid(row=2, column=1)
+                    button.config(state="disabled")
+                else:
+                    tk.Label(frame, text="Friend Found!!!!").grid(row=2, column=1)
+                    button.config(state="normal")
+            else:
+                tk.Label(frame, text="Friend not found").grid(row=2, column=1)
+                button.config(state="disabled")
 
         addfriendWin.mainloop()
         
@@ -394,7 +442,7 @@ class Window():
 
         tk.Button(self.friendsFrame, text="+",state = "normal",command=lambda: self.addNewFriendWin(allFriends)).pack()
 
-        
+       #TODO replace friends list here
         # replace i with list of recent transactinos
         for i in range(3):
             Friend = tk.LabelFrame(allFriends,padx=5 ,pady=10)

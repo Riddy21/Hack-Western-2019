@@ -40,5 +40,5 @@ class Login():
                 self.window.destroy()
                 print(self.username.get())
                 print(self.password.get())
-                Window.Window()
+                Window.Window(self.username.get())
 
