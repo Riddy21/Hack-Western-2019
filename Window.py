@@ -4,10 +4,7 @@ from datetime import date
 import DataBase as mdb
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import (
-    FigureCanvasTkAgg, NavigationToolbar2Tk)
-# Implement the default Matplotlib key bindings.
-from matplotlib.backend_bases import key_press_handler
-from matplotlib.figure import Figure
+    FigureCanvasTkAgg)
 
 class Window():
     def __init__(self,butt):
@@ -516,10 +513,26 @@ class Window():
         tk.Label(self.membersFrame, text="empty").pack()
 
     def populateProfile(self):
-        labels = 'Frogs', 'Hogs', 'Dogs', 'Logs'
-        fracs = [15, 30, 45, 10]
-        fig, axs = plt.subplots(2, 2)
+        labels = 'Groceries', 'Bills', 'Gifts', 'Housing'
+        sizes = [15, 30, 45, 10]
+        data = {"N18": 10, "N19": 15, "N20": 5, "N21": 20, "N22": 66, "N23": 100, "N21": 24}
+        dates = list(data.keys())
+        expenses = list(data.values())
 
-        # A standard pie plot
-        axs[0, 0].pie(fracs, labels=labels, autopct='%1.1f%%', shadow=True)
-        tk.Button(self.profileFrame, text="Back", command = lambda: self.switchFrame(self.mainFrame,self.profileFrame)).pack()
+        fig, axs = plt.subplots(figsize=(2, 2))
+        axs.bar(dates, expenses)
+        fig.suptitle('Daily Spending')
+
+        fig1, axs1 = plt.subplots(figsize=(2, 2))
+        axs1.pie(sizes, labels=labels, autopct='%1.1f%%',
+        shadow=True, startangle=90)
+        axs1.axis('equal')
+        fig1.suptitle('Category')
+
+        canvas = FigureCanvasTkAgg(fig, master=self.profileFrame)  # A tk.DrawingArea.
+        canvas.draw()
+        canvas.get_tk_widget().grid(row = 0,column = 0)
+        canvas1 = FigureCanvasTkAgg(fig1, master=self.profileFrame)  # A tk.DrawingArea.
+        canvas1.draw()
+        canvas1.get_tk_widget().grid(row = 0,column = 1)
+        tk.Button(self.profileFrame, text="Back", command = lambda: self.switchFrame(self.mainFrame,self.profileFrame)).grid(row=1, columnspan = 2)
