@@ -8,5 +8,4 @@ demoUser = {
     "password": "pass",
     "Budget": 600  # monthly budget, resets at start of every month
 }
-
-DBinterface.add_user(demoUser)
+DBinterface.remove_transaction(35671158)

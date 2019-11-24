@@ -126,7 +126,7 @@ class DataBase:
 
     # Removes a transaction based on transactionID
     def remove_transaction(self,transactionID):
-        self.transactions.removeOne({"TransactionID": transactionID})
+        self.transactions.delete_one({"TransactionID": transactionID})
         self.remove_DebtID(transactionID)
 
 
@@ -300,7 +300,8 @@ class DataBase:
         "Balance": 150,
         "Reason": "Pizza money",
         "GroupID": 6768044637,
-        "Date": date.today().strftime("%d/%m/%Y")
+        "Date": date.today().strftime("%d/%m/%Y"),
+        "Category":
     }
 
     demoUser = {
