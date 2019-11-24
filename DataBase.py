@@ -139,6 +139,8 @@ class DataBase:
     def get_transactions(self,UserName):
         return self.transactions.find({"UserName": UserName})
 
+    def get_recentTransactions(self):
+        return self.transactions.find()
 
     ########################################################################################################################
     # USER SHIT
