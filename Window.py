@@ -29,8 +29,8 @@ class Window():
         self.friendsFrame = tk.Frame(self.window)
         self.holdFrame = tk.Frame(self.window)  # holder frame
 
-        self.window.title("Test")
-        self.window.geometry("500x500")
+        self.window.title("Splitz")
+        self.window.geometry("500x600")
         self.window.resizable(1, 1)
 
         self.populateMain()
@@ -70,9 +70,9 @@ class Window():
     def populateMain(self):
 
         self.monthlyBudget.set(self.dbInterface.get_user(self.userName)["Budget"])
-        tk.Label(self.mainFrame, text="Your Monthly Budget is:").pack()
-        tk.Label(self.mainFrame, text=self.monthlyBudget.get()).pack()
-        tk.Button(self.mainFrame, text="Add a Transaction", command=self.openTransactionWin).pack()
+        tk.Label(self.mainFrame, text="Your Monthly Budget is:", font=("Century Gothic", 20)).pack()
+        tk.Label(self.mainFrame, text=self.monthlyBudget.get(), font=("Century Gothic", 20)).pack()
+        tk.Button(self.mainFrame, text="Add a Transaction", font=("Century Gothic", 20), command=self.openTransactionWin).pack()
 
         profiles = tk.LabelFrame(self.mainFrame, text="Profiles and Groups", pady=5, padx=5)
 
@@ -122,7 +122,7 @@ class Window():
     def openTransactionWin(self):
         transactionWin = tk.Tk()
         transactionWin.title("Add Transaction")
-        transactionWin.geometry("300x600")
+        transactionWin.geometry("300x400")
         transactionWin.resizable(0, 0)
 
         transType = tk.Frame(transactionWin)

@@ -11,8 +11,8 @@ class Login():
         self.password = tk.StringVar()
         self.loginFrame = tk.Frame(self.window)
 
-        self.window.title("Test")
-        self.window.geometry("300x150")
+        self.window.title("Login")
+        self.window.geometry("300x100")
         self.window.resizable(0, 0)
 
 
@@ -25,7 +25,7 @@ class Login():
         tk.Label(self.loginFrame,text = "Password").grid(row = 1, column = 0)
         unEntry = tk.Entry(self.loginFrame, textvariable = self.username)
         unEntry.grid(row = 0, column = 1)
-        pwEntry = tk.Entry(self.loginFrame, textvariable=self.password)
+        pwEntry = tk.Entry(self.loginFrame, textvariable=self.password,show="*")
         pwEntry.grid(row = 1, column = 1)
         tk.Button(self.loginFrame,text = "Login", command = self.Login).grid(row = 2, column = 0)
         tk.Button(self.loginFrame,text = "Register").grid(row = 2, column = 1)
