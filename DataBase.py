@@ -269,7 +269,7 @@ class DataBase:
 
     # Gets List of friends from user
     def getFriendsList(self,userName):
-        return self.friendsList.find_one({"Owner": userName})
+        return self.friendsList.find_one({"Owner": userName})["Friends"]
 
 
     # Adds two friends to each other's friends list <3

@@ -363,21 +363,23 @@ class Window():
             window.destroy()
 
         def add(window,friendName):
+            self.dbInterface.addFriend(self.userName,friendName.get())
             window.destroy()
             Friend = tk.LabelFrame(frame,padx=5 ,pady=10)
             tk.Label(Friend, text=friendName.get(), pady=10).grid(sticky="W", row=1, column=0) # change i to $ and actual friends
             tk.Label(Friend, text="$ " + str(100), pady=10).grid(sticky="W", row=1, column=1)
             Friend.pack()
 
-        #TODO fix adding friends
         def searchFriend(frame, button,name):
             #if not name: return
             friend = self.dbInterface.get_user(name.get())
-            print(friend)
-            print("printed friend")
             if friend:
-                tk.Label(frame, text="Friend Found!!!!").grid(row=2, column=1)
-                button.config(state="normal")
+                if friend["UserName"] in self.dbInterface.getFriendsList(self.userName):
+                    tk.Label(frame, text="Already Friends!").grid(row=2, column=1)
+                    button.config(state="disabled")
+                else:
+                    tk.Label(frame, text="Friend Found!!!!").grid(row=2, column=1)
+                    button.config(state="normal")
             else:
                 tk.Label(frame, text="Friend not found").grid(row=2, column=1)
                 button.config(state="disabled")
@@ -403,7 +405,7 @@ class Window():
 
         tk.Button(self.friendsFrame, text="+",state = "normal",command=lambda: self.addNewFriendWin(allFriends)).pack()
 
-        
+       #TODO replace friends list here
         # replace i with list of recent transactinos
         for i in range(3):
             Friend = tk.LabelFrame(allFriends,padx=5 ,pady=10)
