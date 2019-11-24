@@ -38,6 +38,14 @@ class Window():
         self.switchFrame(self.mainFrame, self.holdFrame)
         (self.window).mainloop()
 
+    def updateAllFrames(self):
+        self.monthlyBudget.set(self.dbInterface.get_user(self.userName)["Budget"])
+        self.mainFrame.update()
+        self.groupsFrame.update()
+        self.membersFrame.update()
+        self.profileFrame.update()
+        self.friendsFrame.update()
+
     def switchFrame(self, frame, prevFrame):
         prevFrame.pack_forget()
         frame.pack()
@@ -257,9 +265,8 @@ class Window():
                     time.sleep(1)
                     error.destroy()
 
-
                 else:
-                    #save amount for each person
+                    #TODO:Add a transaction between all
                     transactionWin.destroy()
 
         def personal(frame, window):
@@ -305,7 +312,7 @@ class Window():
                     "Category": category.get()
                 }
                 self.dbInterface.add_transaction(Transaction)
-
+                self.updateAllFrames()
                 transactionWin.destroy()
 
 
