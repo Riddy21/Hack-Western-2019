@@ -39,12 +39,25 @@ class Window():
         (self.window).mainloop()
 
     def updateAllFrames(self):
-        self.monthlyBudget.set(self.dbInterface.get_user(self.userName)["Budget"])
-        self.mainFrame.update()
-        self.groupsFrame.update()
-        self.membersFrame.update()
-        self.profileFrame.update()
-        self.friendsFrame.update()
+        self.mainFrame.destroy()
+        self.groupsFrame.destroy()
+        self.membersFrame.destroy()
+        self.profileFrame.destroy()
+        self.friendsFrame.destroy()
+
+        self.mainFrame = tk.Frame(self.window)
+        self.groupsFrame = tk.Frame(self.window)
+        self.membersFrame = tk.Frame(self.window)
+        self.profileFrame = tk.Frame(self.window)
+        self.friendsFrame = tk.Frame(self.window)
+
+        self.populateMain()
+        self.populateFriends()
+        self.populateGroups()
+        self.populateMembers()
+        self.populateProfile()
+
+        self.switchFrame(self.mainFrame, self.holdFrame)
 
     def switchFrame(self, frame, prevFrame):
         prevFrame.pack_forget()
