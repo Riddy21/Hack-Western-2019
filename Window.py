@@ -470,6 +470,7 @@ class Window():
         allFriends = tk.LabelFrame(self.friendsFrame, pady=5, padx=5)
 
         tk.Button(self.friendsFrame, text="+",state = "normal",command=lambda: self.addNewFriendWin(allFriends)).pack()
+        tk.Button(self.friendsFrame, text="Back",state = "normal",command=lambda: self.switchFrame(self.mainFrame,self.friendsFrame)).pack(side="bottom")
 
        #TODO replace friends list here
 
@@ -494,23 +495,42 @@ class Window():
         NavBar.pack()
 
         tk.Button(self.groupsFrame, text="+",state = "normal",command=lambda: self.addNewGroupWin()).pack()
+        tk.Button(self.groupsFrame, text="Back",state = "normal",command=lambda: self.switchFrame(self.mainFrame,self.groupsFrame)).pack(side="bottom")
 
         allGroups = tk.LabelFrame(self.groupsFrame, pady=5, padx=5)
         # replace i with list of recent transactinos
         for i in range(3):
             GroupFr = tk.LabelFrame(allGroups,padx=5)
             
-            tk.Label(GroupFr, text="Group Name: " + str(i), pady=10).grid(sticky="W", row=i + 1, column=0) # change i to $ and actual groups
+            tk.Label(GroupFr, text="Group Name: " + str(i), pady=10).grid(sticky="W", row=0, column=0) # change i to $ and actual groups
+            tk.Button(GroupFr, text="Details",state = "normal",command=lambda: self.switchFrame(self.membersFrame,self.groupsFrame)).grid(sticky="W", row=0, column=2)
             Group = tk.LabelFrame(GroupFr,padx=5)
-            tk.Label(Group, text="$ " + str(i), pady=10).grid(sticky="W", row=i + 1, column=0)
+            tk.Label(Group, text="$" + str(i), pady=10).grid(sticky="W", row=i + 1, column=0,padx=(0,25))
             for j in range(3):
-                tk.Label(Group, text="M " + str(j), pady=10).grid(sticky="W", row=0, column=j+1)
+                tk.Label(Group, text="M" + str(j), pady=10).grid(sticky="W", row=i+1, column=j+1)
             Group.grid(sticky="W", row=i + 2, column=0)
             GroupFr.pack()
         allGroups.pack()
 
     def populateMembers(self):
-        tk.Label(self.membersFrame, text="empty").pack()
+        tk.Label(self.membersFrame, text="Group Budget: $232.34").pack() #mocking members up
+        youFr = tk.LabelFrame(self.membersFrame,pady = 5,padx=5)
+        youFr.pack()
+        tk.Label(youFr, text="You").grid(row = 1, column = 0, padx=(0,25))
+        tk.Label(youFr, text="Amount Owed").grid(row = 0, column = 2)
+        tk.Label(youFr, text="$90.99").grid(row = 1, column = 2)
+
+        memFr = tk.LabelFrame(self.membersFrame,pady = 15,padx=5)
+        memFr.pack()
+
+        for i in range(3):
+            MemberFr = tk.LabelFrame(memFr,pady = 5,padx=5)
+            MemberFr.pack()
+            tk.Label(MemberFr, text="M" + str(i)).grid(row = 1, column = 0, padx=(0,25))
+            tk.Label(MemberFr, text="Amount Owed").grid(row = 0, column = 2)
+            tk.Label(MemberFr, text="$30.33").grid(row = 1, column = 2)
+        
+        tk.Button(self.membersFrame, text="Back",state = "normal",command=lambda: self.switchFrame(self.groupsFrame,self.membersFrame)).pack(side="bottom")
 
     def populateProfile(self):
         labels = 'Groceries', 'Bills', 'Gifts', 'Housing'
