@@ -2,10 +2,6 @@ import tkinter as tk
 import time
 from datetime import date
 import DataBase as mdb
-from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg)
-# Implement the default Matplotlib key bindings.
-from matplotlib.backend_bases import key_press_handler
-from matplotlib.figure import Figure
 
 class Window():
     def __init__(self,butt):
@@ -560,5 +556,4 @@ class Window():
         tk.Label(self.membersFrame, text="empty").pack()
 
     def populateProfile(self):
->>>>>>> eb46ef8... group transactions work now
         tk.Label(self.profileFrame, text="empty").pack()
