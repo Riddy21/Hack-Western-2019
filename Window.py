@@ -1,6 +1,9 @@
+
 import tkinter as tk
 import time
 from datetime import date
+from random import randint
+
 import DataBase as mdb
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import (
@@ -96,7 +99,7 @@ class Window():
             tk.Label(recentTrans, text="Amazon").grid(sticky="W", row=i + 1, column=0)
             tk.Label(recentTrans, text="11/12/2019").grid(sticky="W", row=i + 1, column=1)
             tk.Label(recentTrans, text="$50").grid(sticky="W", row=i + 1, column=2)
-            tk.Button(recentTrans, text="View", command=lambda: self.openViewTransactionWin(i)).grid(sticky="W",
+            tk.Button(recentTrans, text="View", command=self.openViewTransactionWin).grid(sticky="W",
                                                                                                      row=i + 1,
                                                                                                      column=3)  # change i into list of transactions
 
@@ -250,7 +253,6 @@ class Window():
                     members.append(friendChoose.get())
                     global memberAmount
                     memberAmount = []
-                    print(len(members))
                     for i in range(len(members)):  # according to Group getMembers
                         memberName = tk.StringVar(friendF, value=members[i])  # change to group Member get name
                         memberAmount.append(
@@ -362,24 +364,26 @@ class Window():
 
         transactionWin.mainloop()
 
-    def openViewTransactionWin(self, transaction):
+    def openViewTransactionWin(self):
         transactionViewWin = tk.Tk()
         transactionViewWin.title("View Transaction")
         transactionViewWin.geometry("300x200")
         transactionViewWin.resizable(0, 0)
-
-        if(transaction%2 == 0):
+        if(randint(0,10)%2 == 0):
             tk.Label(transactionViewWin, text = "Group Expense").pack()
             tk.Label(transactionViewWin, text = "Expense Name: "+"name").pack()
             tk.Label(transactionViewWin,text = "Date: "+"11/24/2019").pack()
             tk.Label(transactionViewWin, text = "Value: $"+"300").pack()
             membersF = tk.LabelFrame(transactionViewWin)
-            tk.Label(membersF,text = "Your Balance: "+"-400").pack()
+            tk.Label(membersF,text = "Your Change in Balance: "+"-400").pack()
             for i in range(3):
                 tk.Label(membersF,text = "Friend "+ str(i)+": "+"+100").pack()
             membersF.pack()
         else:
-
+            tk.Label(transactionViewWin, text="Personal Expense").pack()
+            tk.Label(transactionViewWin, text="Expense Name: " + "name").pack()
+            tk.Label(transactionViewWin, text="Date: " + "11/24/2019").pack()
+            tk.Label(transactionViewWin, text="Value: $" + "400").pack()
 
 
 
