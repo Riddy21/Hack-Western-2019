@@ -459,6 +459,7 @@ class Window():
 
         def createGroup():
             #TODO: create a group using specified parameters and pass in nessesary variables
+            addGroupWin.destroy()
 
 
         addGroupWin.mainloop()
