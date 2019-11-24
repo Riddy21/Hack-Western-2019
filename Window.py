@@ -115,9 +115,11 @@ class Window():
 
             w = tk.OptionMenu(groupF, default, *OPTIONS)
             w.grid(row=2, column =0)
-            tk.Button(groupF, text = "Refresh",command = update).
+            tk.Button(groupF, text = "Split Evenly",command = lambda: update()).grid(row =2, column = 1)
 
             def update():
+                for i in range(10):  # according to Group getMembers
+                    memberAmount[i].set(str(float(amount.get()) / 10))
 
 
             groupMembers = tk.LabelFrame(groupF)
@@ -131,8 +133,15 @@ class Window():
 
             groupMembers.grid(row = 3, columnspan = 2)
 
+            sum = 0
+            for i in range(10):  # according to Group getMembers
+                sum += float(memberAmount[i].get())
+
             tk.Button(groupF, text="Add").grid(row=4, column=0) #add function creates expense in database, updates recent expenses and closes window
             tk.Button(groupF, text="Cancel", command = transactionWin.destroy).grid(row=4, column=1)
+
+            if sum != float(amount.get()):
+                tk.Label(groupF,text = )
 
         def personal(frame, window):
             frame.destroy()
