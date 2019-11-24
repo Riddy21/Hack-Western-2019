@@ -381,9 +381,9 @@ class Window():
             
             tk.Label(GroupFr, text="Group Name: " + str(i), pady=10).grid(sticky="W", row=i + 1, column=0) # change i to $ and actual groups
             Group = tk.LabelFrame(GroupFr,padx=5)
-            tk.Label(Group, text="$ " + str(i), pady=10).grid(sticky="W", row=i + 1, column=0)
+            tk.Label(Group, text="$ " + str(i) ,pady=10).grid(sticky="W", row=i + 1, column=0,padx =(0,20))
             for j in range(3):
-                tk.Label(Group, text="M " + str(j), pady=10).grid(sticky="W", row=0, column=j+1)
+                tk.Label(Group, text="M" + str(j), pady=10).grid(sticky="W", row=i + 1, column=j+1)
             Group.grid(sticky="W", row=i + 2, column=0)
             GroupFr.pack()
         allGroups.pack()
