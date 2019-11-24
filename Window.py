@@ -223,12 +223,8 @@ class Window():
                 "Groceries",
                 "Entertainment"
             ]
-            OPTIONS = [
-                "Friend 1",
-                "Friend 2",
-                "Friend 3",
-                "Friend 4"
-            ]  # change to list of friends and groups
+            OPTIONS = self.dbInterface.getFriendsList(self.userName)  # change to list of friends and groups
+            OPTIONS.insert(0,self.userName)
 
             friendChoose = tk.StringVar(friendF)
             friendChoose.set(OPTIONS[0])  # default value
@@ -263,11 +259,13 @@ class Window():
             groupMembers = tk.LabelFrame(friendF)
             groupMembers.grid(row = 4, columnspan = 2)
 
-            tk.Button(friendF, text="Add", state = "normal", command =lambda: addExpense(friendF, amount,memberAmount)).grid(row=5, column=0) #add function creates expense in database, updates recent expenses and closes window
+            tk.Button(friendF, text="Add", state = "normal", command =lambda: addExpense(friendF, amount,memberAmount,members)).grid(row=5, column=0) #add function creates expense in database, updates recent expenses and closes window
             tk.Button(friendF, text="Cancel", command = transactionWin.destroy).grid(row=5, column=1)
 
-            def addExpense(friendF, amount, memberAmount):
+            def addExpense(friendF, amount, memberAmount, members):
                 sum = 0
+                print(memberAmount)
+                print(members)
 
                 for i in memberAmount:  # according to Group getMembers
                     sum += float(i.get())
@@ -280,7 +278,34 @@ class Window():
                     error.destroy()
 
                 else:
-                    #TODO:Add a transaction between all
+                    start3 = 0
+                    Transaction = {
+                        "Balance": sum,
+                        "To/From": "",
+                        "Reason": expName.get(),
+                        "Date": date.today().strftime("%d/%m/%Y"),
+                        "UserName": self.userName,
+                        "GroupID": 0,
+                        "Category": category.get()
+                    }
+                    self.dbInterface.add_transaction(Transaction)
+                    self.dbInterface.adjust_userBudget(self.userName,-sum)
+
+
+                    if members[0] == self.userName:
+                        start3 = 1
+                    for i in range(start3,len(members)):
+                        Debt = {
+                            "UserName": members[i],
+                            "Target": self.userName,
+                            "Balance": int(float(memberAmount[i].get())),
+                            "Reason": expName.get(),
+                            "GroupID": 0,
+                            "Date": date.today().strftime("%d/%m/%Y"),
+                            "Category": category.get()
+                        }
+                        self.dbInterface.add_Debt(Debt)
+                        self.dbInterface.adjust_userBudget(members[i],-int(float(memberAmount[i].get())))
                     transactionWin.destroy()
 
         def personal(frame, window):
@@ -363,11 +388,19 @@ class Window():
             window.destroy()
 
         def add(window,friendName):
+            listOfFriends = self.dbInterface.getFriendsList(self.userName)
+            for i in range(len(listOfFriends)):
+                DebtsToYou = self.dbInterface.get_owes(self.userName)
+                Sum = 0
+                for j in DebtsToYou:
+                    if j["UserName"] == listOfFriends[i]:
+                        Sum += j["Balance"]
+
             self.dbInterface.addFriend(self.userName,friendName.get())
             window.destroy()
             Friend = tk.LabelFrame(frame,padx=5 ,pady=10)
             tk.Label(Friend, text=friendName.get(), pady=10).grid(sticky="W", row=1, column=0) # change i to $ and actual friends
-            tk.Label(Friend, text="$ " + str(100), pady=10).grid(sticky="W", row=1, column=1)
+            tk.Label(Friend, text="$ " + str(Sum), pady=10).grid(sticky="W", row=1, column=1)
             Friend.pack()
 
         def searchFriend(frame, button,name):
@@ -406,11 +439,18 @@ class Window():
         tk.Button(self.friendsFrame, text="+",state = "normal",command=lambda: self.addNewFriendWin(allFriends)).pack()
 
        #TODO replace friends list here
-        # replace i with list of recent transactinos
-        for i in range(3):
+
+        listOfFriends = self.dbInterface.getFriendsList(self.userName)
+        for i in range(len(listOfFriends)):
+            DebtsToYou = self.dbInterface.get_owes(self.userName)
+            Sum = 0
+            for j in DebtsToYou:
+                if j["UserName"] == listOfFriends[i]:
+                    Sum += j["Balance"]
+
             Friend = tk.LabelFrame(allFriends,padx=5 ,pady=10)
-            tk.Label(Friend, text="Friend Name " + str(i), pady=10).grid(sticky="W", row=i + 1, column=0) # change i to $ and actual friends
-            tk.Label(Friend, text="$ " + str(i), pady=10).grid(sticky="W", row=i + 1, column=1)
+            tk.Label(Friend, text="Friend Name: " + listOfFriends[i], pady=10).grid(sticky="W", row=i + 1, column=0) # change i to $ and actual friends
+            tk.Label(Friend, text="$ " + str(Sum), pady=10).grid(sticky="W", row=i + 1, column=1)
             Friend.pack()
         allFriends.pack()
 
